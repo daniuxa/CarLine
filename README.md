@@ -41,7 +41,35 @@ Flujo principal de datos:
 - **Docker Desktop** (para MongoDB, SQL Server, Elasticsearch y Azurite cuando se ejecuta el AppHost).
 - **Node.js** (para la UI con Vite).
 
-> Nota: el AppHost usa volúmenes Docker persistentes (por ejemplo `carline-mongodb-data`, `carline-elasticsearch-data`).
+### ¿Por qué .NET Aspire?
+
+Este proyecto usa **.NET Aspire** como *orquestador de desarrollo*.
+
+En la práctica, el AppHost (proyecto `CarLineProject`) se encarga de:
+- levantar todos los microservicios en el orden correcto,
+- arrancar dependencias (DBs/infra) y cablear variables de entorno,
+- crear referencias entre servicios (por ejemplo, que la Web tenga proxy hacia la API),
+- facilitar un arranque “1 comando” para toda la solución.
+
+### ¿Por qué Docker es necesario?
+
+Al ejecutar el AppHost, las dependencias de infraestructura se ejecutan como **contenedores** (vía Docker), por ejemplo:
+- MongoDB
+- SQL Server
+- Elasticsearch
+- Azurite (emulador de Azure Blob Storage)
+
+Sin Docker, esos componentes no existirán y los servicios que dependen de ellos fallarán al iniciar o al procesar datos.
+
+> Nota: el AppHost usa volúmenes Docker persistentes (por ejemplo `carline-mongodb-data`, `carline-elasticsearch-data`, `carline-azurite-data`) para no perder datos/modelos entre reinicios.
+
+#### Windows
+
+En Windows se recomienda **Docker Desktop + WSL2**.
+
+### Alternativa sin Docker (no recomendada)
+
+Si no puedes usar Docker, necesitas instalar y configurar manualmente (localmente o en otro servidor) MongoDB, Elasticsearch, SQL Server y Azurite/Blob compatible, y apuntar los `ConnectionStrings`/endpoints en `appsettings*.json` de cada servicio.
 
 ## Ejecutar en local (recomendado: Aspire/AppHost)
 
