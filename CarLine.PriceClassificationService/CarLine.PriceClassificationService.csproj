@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-CarLine.PriceClassificationService-9fb0323d-6429-4238-bbca-db13f4a6ea25</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.19.4" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
+        <PackageReference Include="MongoDB.Driver" Version="2.22.0" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CarLine.Common\CarLine.Common.csproj" />
+    </ItemGroup>
+</Project>

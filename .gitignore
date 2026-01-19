@@ -1,0 +1,17 @@
+# Build outputs (all projects)
+**/bin/
+**/obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# VS / Rider / JetBrains
+.vs/
+.idea/
+
+# OS
+[Dd]esktop.ini
+Thumbs.db
