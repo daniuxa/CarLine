@@ -112,3 +112,7 @@ To publish a release on GitHub:
 - create an annotated tag (`git tag -a v1.0.0 -m "v1.0.0"`)
 - push the tag (`git push origin v1.0.0`)
 - create a GitHub Release from the UI (or with `gh release create`)
+
+## Metrics
+
+See `METRICS.md` (EN) / `METRICS.es.md` (ES) for a repeatable way to report size, complexity proxies, and quality (tests + coverage).

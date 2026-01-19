@@ -110,3 +110,7 @@ Para publicar una release en GitHub normalmente se hace:
 - crear tag (`git tag -a v1.0.0 -m "v1.0.0"`)
 - push del tag (`git push origin v1.0.0`)
 - crear GitHub Release desde la UI (o con `gh release create`)
+
+## Métricas
+
+Ver `METRICS.md` (EN) / `METRICS.es.md` (ES) para una forma repetible de reportar tamaño, proxies de complejidad y calidad (tests + cobertura).

@@ -2,6 +2,10 @@
 **/bin/
 **/obj/
 
+# Test results / coverage artifacts
+**/TestResults/
+**/coverage.cobertura.xml
+
 # User-specific files
 *.user
 *.suo
