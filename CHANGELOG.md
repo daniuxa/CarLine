@@ -1,14 +1,14 @@
 # Changelog
 
-El formato sigue una variante de *Keep a Changelog*.
+Format loosely based on *Keep a Changelog*.
 
 ## v1.0.0 — 2026-01-19
 
 ### Added
-- AppHost (.NET Aspire) para orquestar MongoDB, SQL Server, Elasticsearch y Azurite.
-- Pipeline de ingesta → limpieza → entrenamiento → inferencia → API → Web.
-- Endpoints de búsqueda, predicción de precio y suscripciones.
+- AppHost (.NET Aspire) to orchestrate MongoDB, SQL Server, Elasticsearch and Azurite.
+- Ingestion → cleanup → training → inference → API → Web pipeline.
+- Search, price prediction and subscription endpoints.
 
 ### Notes
-- TargetFramework principal: `net10.0`.
-- UI: React + Vite con proxy `/api` hacia `carlineapi` (Aspire).
+- Main TargetFramework: `net10.0`.
+- UI: React + Vite with `/api` proxy to `carlineapi` (Aspire).

@@ -1,102 +1,104 @@
 # CarLineProject
 
-CarLine es una solución *end‑to‑end* para ingesta, limpieza, búsqueda, predicción de precio y suscripción a anuncios de coches.
+English / Español: see `README.es.md` for the Spanish version.
 
-Está implementada como una arquitectura de microservicios .NET orquestada con **.NET Aspire** (AppHost), usando:
-- **MongoDB** para datos crudos/crawleados
-- **Elasticsearch** para búsquedas y filtros (facetas)
-- **Azure Blob Storage (Azurite)** para datasets limpios y modelos
-- **ML.NET (LightGBM)** para entrenamiento e inferencia
-- **SQL Server** para suscripciones
-- **React + Vite** para la UI
+CarLine is an end-to-end solution for car listings ingestion, data cleanup, search, price prediction, and subscription alerts.
 
-## Arquitectura (resumen)
+It is built as a .NET microservices architecture orchestrated with **.NET Aspire** (AppHost), using:
+- **MongoDB** for raw/crawled data
+- **Elasticsearch** for search + filters (facets)
+- **Azure Blob Storage (Azurite)** for cleaned datasets and ML models
+- **ML.NET (LightGBM)** for training and inference
+- **SQL Server** for subscriptions
+- **React + Vite** for the UI
 
-Flujo principal de datos:
+## Architecture (high level)
 
-1. **ExternalCarSellerStub** simula una fuente externa.
-2. **Crawler** ingesta listados (CSV/JSON) hacia MongoDB.
-3. **DataCleanUp** limpia/normaliza datos, indexa en Elasticsearch y sube CSV “cleaned” a Blob.
-4. **TrainingFunction** (Azure Function) se dispara con blobs “cleaned/*.csv”, entrena y sube un modelo a Blob.
-5. **MLInterferenceService** carga el modelo desde Blob y expone endpoints de predicción.
-6. **API** expone endpoints de búsqueda (Elasticsearch) + estimación de precio (ML) + gateway de suscripciones.
-7. **SubscriptionService** gestiona suscripciones (SQL) y procesa envíos (worker + SMTP).
-8. **Web** consume `/api/*` vía proxy de Vite.
+Main data flow:
 
-## Proyectos principales
+1. **ExternalCarSellerStub** simulates an external data source.
+2. **Crawler** ingests listings (CSV/JSON) into MongoDB.
+3. **DataCleanUp** cleans/normalizes data, indexes it into Elasticsearch, and uploads “cleaned” CSV files to Blob.
+4. **TrainingFunction** (Azure Function) is triggered by blobs under “cleaned/*.csv”, trains a model, and uploads it to Blob.
+5. **MLInterferenceService** loads the model from Blob and exposes prediction endpoints.
+6. **API** exposes search (Elasticsearch) + price estimation (ML) + a subscription gateway.
+7. **SubscriptionService** manages subscriptions (SQL) and processes notifications (worker + SMTP).
+8. **Web** consumes `/api/*` via Vite proxy.
 
-- CarLineProject: AppHost (.NET Aspire) que levanta servicios y dependencias.
-- CarLine.API: API pública (`/api/*`) para búsqueda, predicción y suscripciones.
-- CarLine.Web/car-line-web: UI React + Vite (proxy a la API).
-- CarLine.Crawler: ingesta hacia MongoDB (`/api/ingestion/*`).
-- CarLine.DataCleanUp: limpieza + indexado + export a Blob (`/api/cleanup/run`).
-- CarLine.TrainingFunction: entrenamiento automático por BlobTrigger.
-- CarLine.MLInterferenceService: inferencia ML (`/api/carprediction/*`).
-- CarLine.SubscriptionService: CRUD de suscripciones + procesamiento manual (`/api/subscriptions*`).
-- CarLine.PriceClassificationService: worker de clasificación (background service).
+## Main projects
 
-## Requisitos
+- CarLineProject: .NET Aspire AppHost (starts services and dependencies).
+- CarLine.API: public API (`/api/*`) for search, prediction and subscriptions.
+- CarLine.Web/car-line-web: React + Vite UI (proxy to the API).
+- CarLine.Crawler: ingestion into MongoDB (`/api/ingestion/*`).
+- CarLine.DataCleanUp: cleanup + indexing + blob export (`/api/cleanup/run`).
+- CarLine.TrainingFunction: automatic training via BlobTrigger.
+- CarLine.MLInterferenceService: ML inference (`/api/carprediction/*`).
+- CarLine.SubscriptionService: subscriptions CRUD + manual processing trigger (`/api/subscriptions*`).
+- CarLine.PriceClassificationService: background classification worker.
 
-- **.NET SDK 10** (TargetFramework `net10.0`) y workload/paquetes de Aspire usados en el AppHost.
-- **Docker Desktop** (para MongoDB, SQL Server, Elasticsearch y Azurite cuando se ejecuta el AppHost).
-- **Node.js** (para la UI con Vite).
+## Requirements
 
-### ¿Por qué .NET Aspire?
+- **.NET SDK 10** (TargetFramework `net10.0`) and the Aspire packages used by the AppHost.
+- **Docker Desktop** (needed for MongoDB, SQL Server, Elasticsearch and Azurite when running the AppHost).
+- **Node.js** (for the Vite UI).
 
-Este proyecto usa **.NET Aspire** como *orquestador de desarrollo*.
+### Why .NET Aspire?
 
-En la práctica, el AppHost (proyecto `CarLineProject`) se encarga de:
-- levantar todos los microservicios en el orden correcto,
-- arrancar dependencias (DBs/infra) y cablear variables de entorno,
-- crear referencias entre servicios (por ejemplo, que la Web tenga proxy hacia la API),
-- facilitar un arranque “1 comando” para toda la solución.
+This project uses **.NET Aspire** as a *development orchestrator*.
 
-### ¿Por qué Docker es necesario?
+In practice, the AppHost (project `CarLineProject`) handles:
+- starting all microservices in the correct order,
+- starting infrastructure dependencies and wiring environment variables,
+- defining service-to-service references (e.g. Web proxying to the API),
+- enabling a “one command” local run for the whole solution.
 
-Al ejecutar el AppHost, las dependencias de infraestructura se ejecutan como **contenedores** (vía Docker), por ejemplo:
+### Why Docker is required?
+
+When you run the AppHost, the infrastructure dependencies run as **containers** (via Docker), for example:
 - MongoDB
 - SQL Server
 - Elasticsearch
-- Azurite (emulador de Azure Blob Storage)
+- Azurite (Azure Blob Storage emulator)
 
-Sin Docker, esos componentes no existirán y los servicios que dependen de ellos fallarán al iniciar o al procesar datos.
+Without Docker, those components will not exist and dependent services will fail at startup or at runtime.
 
-> Nota: el AppHost usa volúmenes Docker persistentes (por ejemplo `carline-mongodb-data`, `carline-elasticsearch-data`, `carline-azurite-data`) para no perder datos/modelos entre reinicios.
+> Note: the AppHost uses persistent Docker volumes (e.g. `carline-mongodb-data`, `carline-elasticsearch-data`, `carline-azurite-data`) so data/models survive restarts.
 
 #### Windows
 
-En Windows se recomienda **Docker Desktop + WSL2**.
+On Windows, **Docker Desktop + WSL2** is recommended.
 
-### Alternativa sin Docker (no recomendada)
+### Docker-free fallback (not recommended)
 
-Si no puedes usar Docker, necesitas instalar y configurar manualmente (localmente o en otro servidor) MongoDB, Elasticsearch, SQL Server y Azurite/Blob compatible, y apuntar los `ConnectionStrings`/endpoints en `appsettings*.json` de cada servicio.
+If you cannot use Docker, you must manually install/configure MongoDB, Elasticsearch, SQL Server and an Azurite/Blob-compatible service and then point each service’s `appsettings*.json` `ConnectionStrings`/endpoints to those instances.
 
-## Ejecutar en local (recomendado: Aspire/AppHost)
+## Run locally (recommended: Aspire/AppHost)
 
-Desde la raíz del repo:
+From the repo root:
 
 - `dotnet run --project CarLineProject/CarLineProject.csproj`
 
-Esto levanta:
+This starts:
 - MongoDB + DB `carsnosql`
-- SQL Server + DB `subscriptionsdb` (mapeado a host port `54040`)
+- SQL Server + DB `subscriptionsdb` (mapped to host port `54040`)
 - Elasticsearch
-- Azurite + container de blobs para modelos/datasets
-- Todos los servicios .NET
-- La UI (Vite) con instalación automática de paquetes npm
+- Azurite + blob container for models/datasets
+- all .NET services
+- the UI (Vite) with automatic npm package installation
 
-## Endpoints clave (rápido)
+## Key endpoints (quick)
 
-API pública:
-- `GET /api/CarsSearch/search` (búsqueda + filtros)
-- `POST /api/CarPricePrediction/estimate` (estimación de precio)
+Public API:
+- `GET /api/CarsSearch/search` (search + filters)
+- `POST /api/CarPricePrediction/estimate` (price estimate)
 - `POST /api/CarSubscription` / `GET /api/CarSubscription?email=...` / `DELETE /api/CarSubscription/{id}`
 
-Servicios internos:
-- Crawler: `POST /api/Ingestion/upload` (CSV) y `POST /api/Ingestion/upload-json` (JSON)
+Internal services:
+- Crawler: `POST /api/Ingestion/upload` (CSV) and `POST /api/Ingestion/upload-json` (JSON)
 - Cleanup: `POST /api/Cleanup/run`
-- Inferencia ML: `POST /api/CarPrediction/predict` y `POST /api/CarPrediction/predict/batch`
-- Suscripciones (directo): `POST/GET/DELETE /api/subscriptions` + `POST /api/subscriptions-processing/run`
+- ML inference: `POST /api/CarPrediction/predict` and `POST /api/CarPrediction/predict/batch`
+- Subscriptions (direct): `POST/GET/DELETE /api/subscriptions` + `POST /api/subscriptions-processing/run`
 
 ## Tests
 
@@ -104,9 +106,9 @@ Servicios internos:
 
 ## Releases
 
-Este repo usa versionado con tags (`vX.Y.Z`). Ver CHANGELOG en `CHANGELOG.md`.
+This repo uses tag-based versioning (`vX.Y.Z`). See the changelog in `CHANGELOG.md` (EN) / `CHANGELOG.es.md` (ES).
 
-Para publicar una release en GitHub normalmente se hace:
-- crear tag (`git tag -a v1.0.0 -m "v1.0.0"`)
-- push del tag (`git push origin v1.0.0`)
-- crear GitHub Release desde la UI (o con `gh release create`)
+To publish a release on GitHub:
+- create an annotated tag (`git tag -a v1.0.0 -m "v1.0.0"`)
+- push the tag (`git push origin v1.0.0`)
+- create a GitHub Release from the UI (or with `gh release create`)
