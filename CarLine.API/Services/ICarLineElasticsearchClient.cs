@@ -4,7 +4,7 @@ using Elastic.Clients.Elasticsearch.Aggregations;
 namespace CarLine.API.Services;
 
 /// <summary>
-/// Minimal search response shape needed by CarLine services.
+///     Minimal search response shape needed by CarLine services.
 /// </summary>
 public sealed record CarLineSearchResponse<TDocument>(
     bool IsValid,
@@ -13,7 +13,8 @@ public sealed record CarLineSearchResponse<TDocument>(
     AggregateDictionary? Aggregations);
 
 /// <summary>
-/// Small abstraction over Elastic.Clients.Elasticsearch.ElasticsearchClient to keep application services unit-testable.
+///     Small abstraction over Elastic.Clients.Elasticsearch.ElasticsearchClient to keep application services
+///     unit-testable.
 /// </summary>
 public interface ICarLineElasticsearchClient
 {

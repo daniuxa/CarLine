@@ -1,6 +1,6 @@
 ﻿using CarLine.API.Models;
-using CarLine.Common.Models;
 using CarLine.API.Queries;
+using CarLine.Common.Models;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Aggregations;
 
@@ -76,7 +76,8 @@ public class CarsSearchService(ICarLineElasticsearchClient elasticsearchClient, 
                 ad.Add("fuel_facet", a => a.Terms(t => t.Field("fuel.keyword").Size(10)));
                 ad.Add("transmission_facet", a => a.Terms(t => t.Field("transmission.keyword").Size(10)));
                 ad.Add("condition_facet", a => a.Terms(t => t.Field("condition.keyword").Size(10)));
-                ad.Add("price_classification_facet", a => a.Terms(t => t.Field("price_classification.keyword").Size(10)));
+                ad.Add("price_classification_facet",
+                    a => a.Terms(t => t.Field("price_classification.keyword").Size(10)));
                 ad.Add("type_facet", a => a.Terms(t => t.Field("type.keyword").Size(10)));
                 ad.Add("region_facet", a => a.Terms(t => t.Field("region.keyword").Size(30)));
             })
@@ -104,10 +105,8 @@ public class CarsSearchService(ICarLineElasticsearchClient elasticsearchClient, 
             {
                 var statusTerms = statusAgg as StringTermsAggregate;
                 if (statusTerms?.Buckets != null)
-                {
                     result.Facets["status"] = statusTerms.Buckets
-                        .ToDictionary(b => b.Key.ToString(), b => (long)b.DocCount);
-                }
+                        .ToDictionary(b => b.Key.ToString(), b => b.DocCount);
             }
 
             if (response.Aggregations.TryGetValue("manufacturer_facet", out var manuAgg))
@@ -116,7 +115,7 @@ public class CarsSearchService(ICarLineElasticsearchClient elasticsearchClient, 
                 if (manuTerms?.Buckets != null)
                 {
                     result.Facets["manufacturer"] = manuTerms.Buckets
-                        .ToDictionary(b => b.Key.ToString(), b => (long)b.DocCount);
+                        .ToDictionary(b => b.Key.ToString(), b => b.DocCount);
 
                     var manufacturerModels = new Dictionary<string, Dictionary<string, long>>();
                     foreach (var b in manuTerms.Buckets)
@@ -128,12 +127,8 @@ public class CarsSearchService(ICarLineElasticsearchClient elasticsearchClient, 
                         {
                             var topModels = topModelsAgg as StringTermsAggregate;
                             if (topModels?.Buckets != null)
-                            {
                                 foreach (var mb in topModels.Buckets)
-                                {
-                                    modelsDict[mb.Key.ToString()] = (long)mb.DocCount;
-                                }
-                            }
+                                    modelsDict[mb.Key.ToString()] = mb.DocCount;
                         }
 
                         manufacturerModels[manuKey] = modelsDict;
@@ -147,70 +142,56 @@ public class CarsSearchService(ICarLineElasticsearchClient elasticsearchClient, 
             {
                 var fuelTerms = fuelAgg as StringTermsAggregate;
                 if (fuelTerms?.Buckets != null)
-                {
                     result.Facets["fuel"] = fuelTerms.Buckets
-                        .ToDictionary(b => b.Key.ToString(), b => (long)b.DocCount);
-                }
+                        .ToDictionary(b => b.Key.ToString(), b => b.DocCount);
             }
 
             if (response.Aggregations.TryGetValue("transmission_facet", out var transAgg))
             {
                 var transTerms = transAgg as StringTermsAggregate;
                 if (transTerms?.Buckets != null)
-                {
                     result.Facets["transmission"] = transTerms.Buckets
-                        .ToDictionary(b => b.Key.ToString(), b => (long)b.DocCount);
-                }
+                        .ToDictionary(b => b.Key.ToString(), b => b.DocCount);
             }
 
             if (response.Aggregations.TryGetValue("condition_facet", out var condAgg))
             {
                 var condTerms = condAgg as StringTermsAggregate;
                 if (condTerms?.Buckets != null)
-                {
                     result.Facets["condition"] = condTerms.Buckets
-                        .ToDictionary(b => b.Key.ToString(), b => (long)b.DocCount);
-                }
+                        .ToDictionary(b => b.Key.ToString(), b => b.DocCount);
             }
 
             if (response.Aggregations.TryGetValue("price_classification_facet", out var priceClassAgg))
             {
                 var priceClassTerms = priceClassAgg as StringTermsAggregate;
                 if (priceClassTerms?.Buckets != null)
-                {
                     result.Facets["price_classification"] = priceClassTerms.Buckets
-                        .ToDictionary(b => b.Key.ToString(), b => (long)b.DocCount);
-                }
+                        .ToDictionary(b => b.Key.ToString(), b => b.DocCount);
             }
 
             if (response.Aggregations.TryGetValue("model_facet", out var modelAgg))
             {
                 var modelTerms = modelAgg as StringTermsAggregate;
                 if (modelTerms?.Buckets != null)
-                {
                     result.Facets["model"] = modelTerms.Buckets
-                        .ToDictionary(b => b.Key.ToString(), b => (long)b.DocCount);
-                }
+                        .ToDictionary(b => b.Key.ToString(), b => b.DocCount);
             }
 
             if (response.Aggregations.TryGetValue("type_facet", out var typeAgg))
             {
                 var typeTerms = typeAgg as StringTermsAggregate;
                 if (typeTerms?.Buckets != null)
-                {
                     result.Facets["type"] = typeTerms.Buckets
-                        .ToDictionary(b => b.Key.ToString(), b => (long)b.DocCount);
-                }
+                        .ToDictionary(b => b.Key.ToString(), b => b.DocCount);
             }
 
             if (response.Aggregations.TryGetValue("region_facet", out var regionAgg))
             {
                 var regionTerms = regionAgg as StringTermsAggregate;
                 if (regionTerms?.Buckets != null)
-                {
                     result.Facets["region"] = regionTerms.Buckets
-                        .ToDictionary(b => b.Key.ToString(), b => (long)b.DocCount);
-                }
+                        .ToDictionary(b => b.Key.ToString(), b => b.DocCount);
             }
         }
 

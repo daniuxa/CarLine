@@ -1,4 +1,5 @@
 using Azure.Provisioning.Storage;
+using Projects;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -32,44 +33,44 @@ var modelsContainer = azureBlobStorage.AddBlobs("modelscontainer");
 
 // ----- Services and Applications -----
 // External Car Seller Stub - for simulating external data source
-var externalCarSellerStub = builder.AddProject<Projects.CarLine_ExternalCarSellerStub>("externalcarsellerstub");
+var externalCarSellerStub = builder.AddProject<CarLine_ExternalCarSellerStub>("externalcarsellerstub");
 
 // Car Crawler Service - ingests data from external car sellers stub into NoSQL DB
-var carCrawlerService = builder.AddProject<Projects.CarLine_Crawler>("carcrawler")
+var carCrawlerService = builder.AddProject<CarLine_Crawler>("carcrawler")
     .WithReference(carsNoSqlDb)
     .WithReference(externalCarSellerStub) // Reference to external car seller stub
     .WaitFor(carsNoSqlDb)
     .WaitFor(externalCarSellerStub);
 
 // Data Cleanup Service - processes and cleans data in NoSQL DB, indexes into Elasticsearch, stores cleaned csv in Blob Storage
-var dataCleanupService = builder.AddProject<Projects.CarLine_DataCleanUp>("datacleanup")
+var dataCleanupService = builder.AddProject<CarLine_DataCleanUp>("datacleanup")
     .WithReference(carsNoSqlDb)
     .WithReference(elasticsearch)
-    .WithReference(modelsContainer) 
+    .WithReference(modelsContainer)
     .WaitFor(carsNoSqlDb)
     .WaitFor(elasticsearch)
     .WaitFor(modelsContainer);
 
 // Training Model Service - trains ML models using data from Blob Storage
-var trainingModelService = builder.AddAzureFunctionsProject<Projects.CarLine_TrainingFunction>("trainingmodel")
+var trainingModelService = builder.AddAzureFunctionsProject<CarLine_TrainingFunction>("trainingmodel")
     .WithHostStorage(azureBlobStorage)
     .WithRoleAssignments(azureBlobStorage, StorageBuiltInRole.StorageBlobDataOwner)
-    .WithReference(modelsContainer) 
-    .WaitFor(modelsContainer);
-
-// ML Inference Service - provides ML model inference capabilities
-var carLineMlInferenceService = builder.AddProject<Projects.CarLine_MLInterferenceService>("carlinemlinferenceservice")
     .WithReference(modelsContainer)
     .WaitFor(modelsContainer);
 
-var subscriptionService = builder.AddProject<Projects.CarLine_SubscriptionService>("subscriptionservice")
+// ML Inference Service - provides ML model inference capabilities
+var carLineMlInferenceService = builder.AddProject<CarLine_MLInterferenceService>("carlinemlinferenceservice")
+    .WithReference(modelsContainer)
+    .WaitFor(modelsContainer);
+
+var subscriptionService = builder.AddProject<CarLine_SubscriptionService>("subscriptionservice")
     .WithReference(carsNoSqlDb)
     .WithReference(subscriptionsSql)
     .WaitFor(carsNoSqlDb)
     .WaitFor(subscriptionsSql);
 
 // Car Line API - main API service for Car Line application
-var carLineApi = builder.AddProject<Projects.CarLine_API>("carlineapi")
+var carLineApi = builder.AddProject<CarLine_API>("carlineapi")
     .WithReference(carsNoSqlDb)
     .WithReference(elasticsearch)
     .WithReference(modelsContainer)
@@ -82,7 +83,7 @@ var carLineApi = builder.AddProject<Projects.CarLine_API>("carlineapi")
     .WaitFor(subscriptionService);
 
 // Price Classification Service - classifies car prices using ML Inference Service
-var priceClassificationService = builder.AddProject<Projects.CarLine_PriceClassificationService>("priceclassificationservice")
+var priceClassificationService = builder.AddProject<CarLine_PriceClassificationService>("priceclassificationservice")
     .WithReference(carsNoSqlDb)
     .WithReference(elasticsearch)
     .WithReference(carLineMlInferenceService)

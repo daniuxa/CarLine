@@ -1,5 +1,5 @@
-using System.Globalization;
 using System.Diagnostics;
+using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Mvc;
@@ -12,8 +12,8 @@ namespace CarLine.Crawler.Controllers;
 [Route("api/[controller]")]
 public class IngestionController : ControllerBase
 {
-    private readonly ILogger<IngestionController> _logger;
     private readonly IMongoCollection<BsonDocument> _carsCollection;
+    private readonly ILogger<IngestionController> _logger;
 
     public IngestionController(ILogger<IngestionController> logger, IMongoClient mongoClient)
     {
@@ -31,25 +31,31 @@ public class IngestionController : ControllerBase
         try
         {
             var filesCount = Request?.Form?.Files?.Count ?? 0;
-            _logger.LogInformation("Upload request received. Provided IFormFile param null? {IsNull}. Request.Form.Files.Count={Count}", file == null, filesCount);
+            _logger.LogInformation(
+                "Upload request received. Provided IFormFile param null? {IsNull}. Request.Form.Files.Count={Count}",
+                file == null, filesCount);
 
             if ((file == null || file.Length == 0) && filesCount > 0)
             {
                 file = Request.Form.Files[0];
-                _logger.LogInformation("Fallback: using first file from Request.Form.Files. FileName={FileName}, Length={Length}", file?.FileName, file?.Length);
+                _logger.LogInformation(
+                    "Fallback: using first file from Request.Form.Files. FileName={FileName}, Length={Length}",
+                    file?.FileName, file?.Length);
             }
         }
         catch (Exception ex) when (ex is InvalidDataException || ex is BadHttpRequestException)
         {
             // Common when multipart body size is exceeded or request is malformed.
             _logger.LogWarning(ex, "Failed to read multipart form (likely size limit or malformed body)");
-            return BadRequest(new { message = "Failed to read the request form. The multipart body may be too large or malformed." });
+            return BadRequest(new
+                { message = "Failed to read the request form. The multipart body may be too large or malformed." });
         }
 
         if (file == null || file.Length == 0)
             return BadRequest(new { message = "No file uploaded" });
 
-        _logger.LogInformation("Starting CSV ingestion upload. FileName={FileName}, Length={Length} bytes", file.FileName, file.Length);
+        _logger.LogInformation("Starting CSV ingestion upload. FileName={FileName}, Length={Length} bytes",
+            file.FileName, file.Length);
         var swTotal = Stopwatch.StartNew();
 
         var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
@@ -76,16 +82,13 @@ public class IngestionController : ControllerBase
         if (header.Length > 0)
             _logger.LogDebug("CSV header sample: {HeaderSample}", string.Join(", ", header.Take(20)));
         else
-        {
             _logger.LogWarning("Uploaded CSV contains no header columns.");
-        }
 
         var swBatch = new Stopwatch();
         var lastProgressLog = 0;
-        string lastProcessedId = "(none)";
+        var lastProcessedId = "(none)";
 
         while (await csv.ReadAsync())
-        {
             try
             {
                 var doc = new BsonDocument();
@@ -120,7 +123,8 @@ public class IngestionController : ControllerBase
                     lastProcessedId = idVal.ToString()!;
                     var filter = Builders<BsonDocument>.Filter.Eq("_id", idVal);
                     var update = new BsonDocument("$set", doc);
-                    var result = await _carsCollection.UpdateOneAsync(filter, update, new UpdateOptions { IsUpsert = true });
+                    var result =
+                        await _carsCollection.UpdateOneAsync(filter, update, new UpdateOptions { IsUpsert = true });
 
                     if (result.UpsertedId != null)
                     {
@@ -149,7 +153,9 @@ public class IngestionController : ControllerBase
                 if (processed - lastProgressLog >= 1000)
                 {
                     lastProgressLog = processed;
-                    _logger.LogInformation("Ingestion progress: processed={Processed}, inserted={Inserted}, updated={Updated}, errors={Errors}, lastId={LastId}", processed, inserted, updated, errors, lastProcessedId);
+                    _logger.LogInformation(
+                        "Ingestion progress: processed={Processed}, inserted={Inserted}, updated={Updated}, errors={Errors}, lastId={LastId}",
+                        processed, inserted, updated, errors, lastProcessedId);
                 }
 
                 // Flush batch inserts periodically
@@ -162,12 +168,14 @@ public class IngestionController : ControllerBase
                         await _carsCollection.BulkWriteAsync(toInsert);
                         swBatch.Stop();
                         inserted += toInsert.Count;
-                        _logger.LogInformation("Batch flushed: {BatchSize} docs in {ElapsedMs}ms", toInsert.Count, swBatch.ElapsedMilliseconds);
+                        _logger.LogInformation("Batch flushed: {BatchSize} docs in {ElapsedMs}ms", toInsert.Count,
+                            swBatch.ElapsedMilliseconds);
                     }
                     catch (Exception ex)
                     {
                         swBatch.Stop();
-                        _logger.LogError(ex, "Batch insert failed for {BatchSize} docs. LastId={LastId}", toInsert.Count, lastProcessedId);
+                        _logger.LogError(ex, "Batch insert failed for {BatchSize} docs. LastId={LastId}",
+                            toInsert.Count, lastProcessedId);
                     }
                     finally
                     {
@@ -179,18 +187,20 @@ public class IngestionController : ControllerBase
             {
                 errors++;
                 // Try to capture a small sample of the record for debugging
-                string sample = "(no sample)";
+                var sample = "(no sample)";
                 try
                 {
                     var rec = csv.Context.Parser.Record;
                     if (rec != null)
                         sample = string.Join(",", rec.Take(10).ToArray());
                 }
-                catch { /* ignore sample capture failures */ }
+                catch
+                {
+                    /* ignore sample capture failures */
+                }
 
                 _logger.LogError(ex, "Failed to process CSV row {Row}. Sample={Sample}", processed + 1, sample);
             }
-        }
 
         // Final flush
         if (toInsert.Count > 0)
@@ -202,12 +212,14 @@ public class IngestionController : ControllerBase
                 await _carsCollection.BulkWriteAsync(toInsert);
                 swBatch.Stop();
                 inserted += toInsert.Count;
-                _logger.LogInformation("Final batch flushed: {BatchSize} docs in {ElapsedMs}ms", toInsert.Count, swBatch.ElapsedMilliseconds);
+                _logger.LogInformation("Final batch flushed: {BatchSize} docs in {ElapsedMs}ms", toInsert.Count,
+                    swBatch.ElapsedMilliseconds);
             }
             catch (Exception ex)
             {
                 swBatch.Stop();
-                _logger.LogError(ex, "Final batch insert failed for {BatchSize} docs. LastId={LastId}", toInsert.Count, lastProcessedId);
+                _logger.LogError(ex, "Final batch insert failed for {BatchSize} docs. LastId={LastId}", toInsert.Count,
+                    lastProcessedId);
             }
             finally
             {
@@ -218,7 +230,9 @@ public class IngestionController : ControllerBase
         swTotal.Stop();
         // Log final memory and last processed id for diagnostics
         var mem = GC.GetTotalMemory(false);
-        _logger.LogInformation("CSV ingestion completed in {Elapsed}. processed={Processed}, inserted={Inserted}, updated={Updated}, errors={Errors}, dropped={Dropped}, lastId={LastId}, memoryBytes={Memory}", swTotal.Elapsed, processed, inserted, updated, errors, dropped, lastProcessedId, mem);
+        _logger.LogInformation(
+            "CSV ingestion completed in {Elapsed}. processed={Processed}, inserted={Inserted}, updated={Updated}, errors={Errors}, dropped={Dropped}, lastId={LastId}, memoryBytes={Memory}",
+            swTotal.Elapsed, processed, inserted, updated, errors, dropped, lastProcessedId, mem);
 
         var summary = new
         {
@@ -276,7 +290,8 @@ public class IngestionController : ControllerBase
         }
 
         sw.Stop();
-        _logger.LogInformation("JSON ingestion processed {Processed} listings in {Elapsed}. Flushed {Flushed} ops. LastUrl={LastUrl}",
+        _logger.LogInformation(
+            "JSON ingestion processed {Processed} listings in {Elapsed}. Flushed {Flushed} ops. LastUrl={LastUrl}",
             processed, sw.Elapsed, flushed, lastUrl);
 
         return Ok(new { processed, flushed, lastUrl, elapsed = sw.Elapsed });
@@ -303,7 +318,8 @@ public class IngestionController : ControllerBase
             sw.Stop();
         }
 
-        _logger.LogInformation("Flushed JSON batch of {BatchSize} docs in {ElapsedMs}ms (processed={Processed}, lastUrl={LastUrl})",
+        _logger.LogInformation(
+            "Flushed JSON batch of {BatchSize} docs in {ElapsedMs}ms (processed={Processed}, lastUrl={LastUrl})",
             batch.Count, sw.ElapsedMilliseconds, processed, lastUrl);
     }
 
@@ -332,5 +348,8 @@ public class IngestionController : ControllerBase
         };
     }
 
-    private static BsonValue ValueOrNull(string? value) => string.IsNullOrWhiteSpace(value) ? BsonNull.Value : value;
+    private static BsonValue ValueOrNull(string? value)
+    {
+        return string.IsNullOrWhiteSpace(value) ? BsonNull.Value : value;
+    }
 }

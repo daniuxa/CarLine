@@ -1,5 +1,4 @@
-﻿using CarLine.API.Models;
-using CarLine.API.Services;
+﻿using CarLine.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarLine.API.Controllers;

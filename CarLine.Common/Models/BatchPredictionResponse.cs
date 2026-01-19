@@ -11,4 +11,3 @@ public sealed class BatchPredictionResponse
 
     public DateTime Timestamp { get; set; }
 }
-

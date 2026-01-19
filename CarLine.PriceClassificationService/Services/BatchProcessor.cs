@@ -1,10 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using CarLine.Common.Models;
+﻿using CarLine.Common.Models;
 using CarLine.Common.Services;
 using CarLine.PriceClassificationService.Models;
 using Elastic.Clients.Elasticsearch;
@@ -23,8 +17,8 @@ internal sealed class BatchProcessor(
         List<(BsonDocument doc, CarPredictionRequestData data)> batch,
         CancellationToken cancellationToken)
     {
-        int classified = 0;
-        int errors = 0;
+        var classified = 0;
+        var errors = 0;
 
         try
         {
@@ -61,10 +55,11 @@ internal sealed class BatchProcessor(
 
             // Update MongoDB with predictions
             var bulkUpdates = new List<WriteModel<BsonDocument>>();
-            var esUpdates = new List<(string id, string classification, decimal predictedPrice, decimal priceDiff, DateTime classDate)>();
+            var esUpdates =
+                new List<(string id, string classification, decimal predictedPrice, decimal priceDiff, DateTime
+                    classDate)>();
 
-            for (int i = 0; i < result.Predictions.Count && i < batch.Count; i++)
-            {
+            for (var i = 0; i < result.Predictions.Count && i < batch.Count; i++)
                 try
                 {
                     var prediction = result.Predictions[i];
@@ -80,7 +75,7 @@ internal sealed class BatchProcessor(
                     var actualPrice = data.ActualPrice;
 
                     // Calculate price classification - use decimal arithmetic
-                    var priceDifference = ((actualPrice - predictedPrice) / predictedPrice) * 100m;
+                    var priceDifference = (actualPrice - predictedPrice) / predictedPrice * 100m;
                     var priceClassification = ClassifyPrice(priceDifference);
                     var classificationDate = DateTime.UtcNow;
                     var classificationString = priceClassification.ToStorageString();
@@ -112,14 +107,12 @@ internal sealed class BatchProcessor(
                     }
 
                     if (!string.IsNullOrWhiteSpace(esId))
-                    {
                         esUpdates.Add((esId, classificationString,
                             Math.Round(predictedPrice, 2), Math.Round(priceDifference, 2), classificationDate));
-                    }
                     else
-                    {
-                        logger.LogWarning("Skipping Elasticsearch update for MongoDB document {mongoId} because no URL-based id available", doc.GetValue("_id").ToString());
-                    }
+                        logger.LogWarning(
+                            "Skipping Elasticsearch update for MongoDB document {mongoId} because no URL-based id available",
+                            doc.GetValue("_id").ToString());
 
                     classified++;
                 }
@@ -128,27 +121,23 @@ internal sealed class BatchProcessor(
                     logger.LogWarning(ex, "Error processing prediction result for car in batch");
                     errors++;
                 }
-            }
 
             // Execute MongoDB bulk update
             if (bulkUpdates.Count > 0)
-            {
                 await carsCollection.BulkWriteAsync(bulkUpdates, cancellationToken: cancellationToken);
-            }
 
             // Execute Elasticsearch bulk update
             if (esUpdates.Count > 0)
-            {
                 try
                 {
                     await UpdateElasticsearchBulkAsync(esUpdates, cancellationToken);
-                    logger.LogInformation("Updated {count} documents in Elasticsearch with price classifications", esUpdates.Count);
+                    logger.LogInformation("Updated {count} documents in Elasticsearch with price classifications",
+                        esUpdates.Count);
                 }
                 catch (Exception ex)
                 {
                     logger.LogError(ex, "Failed to update Elasticsearch with price classifications");
                 }
-            }
 
             // Account for any errors from ML service
             errors += result.Errors?.Count ?? 0;
@@ -208,10 +197,14 @@ internal sealed class BatchProcessor(
                     ? $" | Caused by: {item.Error.CausedBy.Type}: {item.Error.CausedBy.Reason}"
                     : string.Empty;
 
-                logger.LogError("Bulk item error for document {id}: Status={status}, Type={type}, Reason={reason}{causedBy}", item.Id, item.Status, errorType, errorReason, causedBy);
+                logger.LogError(
+                    "Bulk item error for document {id}: Status={status}, Type={type}, Reason={reason}{causedBy}",
+                    item.Id, item.Status, errorType, errorReason, causedBy);
             }
 
-            logger.LogError("Elasticsearch bulk update completed with {realErrors} real errors and {exists} conflicts (already existed)", realErrors, alreadyExists);
+            logger.LogError(
+                "Elasticsearch bulk update completed with {realErrors} real errors and {exists} conflicts (already existed)",
+                realErrors, alreadyExists);
             return;
         }
 

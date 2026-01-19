@@ -13,4 +13,3 @@ public class ExternalApiConfig
     public string BaseUrl { get; set; } = string.Empty;
     public bool Enabled { get; set; } = true;
 }
-

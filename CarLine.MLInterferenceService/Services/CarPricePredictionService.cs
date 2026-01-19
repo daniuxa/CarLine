@@ -1,7 +1,7 @@
-﻿using Microsoft.ML;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 using CarLine.Common;
 using CarLine.Common.Models;
+using Microsoft.ML;
 
 namespace CarLine.MLInterferenceService.Services;
 
@@ -10,10 +10,12 @@ public class CarPricePredictionService(
     ILogger<CarPricePredictionService> logger,
     BlobServiceClient blobServiceClient)
 {
-    private readonly BlobContainerClient _blobClient = blobServiceClient.GetBlobContainerClient(StorageConstants.ModelsContainer);
+    private readonly BlobContainerClient _blobClient =
+        blobServiceClient.GetBlobContainerClient(StorageConstants.ModelsContainer);
+
+    private readonly SemaphoreSlim _modelLock = new(1, 1);
     private ITransformer? _model;
     private PredictionEngine<CarTrainingModel, CarPricePrediction>? _predictionEngine;
-    private readonly SemaphoreSlim _modelLock = new(1, 1);
 
     public async Task<CarPricePrediction> PredictPriceAsync(CarPredictionRequest request)
     {
@@ -21,12 +23,10 @@ public class CarPricePredictionService(
         await EnsureModelLoadedAsync();
 
         if (_predictionEngine == null)
-        {
             throw new InvalidOperationException("Model not loaded. No trained model available.");
-        }
 
         // Apply same transformations as during training
-        var input = new CarTrainingModel()
+        var input = new CarTrainingModel
         {
             manufacturer = request.Manufacturer.Trim().ToLowerInvariant(),
             model = NormalizeModelName(request.Model), // Apply first-word normalization
@@ -69,13 +69,11 @@ public class CarPricePredictionService(
             var latestDate = DateTimeOffset.MinValue;
 
             await foreach (var blob in blobs)
-            {
                 if (blob.Properties.CreatedOn > latestDate)
                 {
                     latestDate = blob.Properties.CreatedOn ?? DateTimeOffset.MinValue;
                     latestBlobName = blob.Name;
                 }
-            }
 
             if (latestBlobName == null)
             {

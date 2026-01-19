@@ -39,17 +39,17 @@ public sealed class SmtpEmailSender(
         client.UseDefaultCredentials = false;
 
         if (!string.IsNullOrWhiteSpace(_settings.Username))
-        {
             client.Credentials = new NetworkCredential(_settings.Username, _settings.Password);
-        }
 
-        logger.LogInformation("Sending SMTP email via {Host}:{Port} (TLS mode: {TlsMode}, EnableSsl={EnableSsl}) to {Email}",
+        logger.LogInformation(
+            "Sending SMTP email via {Host}:{Port} (TLS mode: {TlsMode}, EnableSsl={EnableSsl}) to {Email}",
             _settings.Host, port, _settings.TlsMode, enableSsl, toEmail);
 
         // SmtpClient has no true async send with CancellationToken; SendMailAsync honors cancellation via token on some platforms.
         await client.SendMailAsync(msg, cancellationToken);
 
-        logger.LogInformation("Sent subscription digest email to {Email} for subscription {SubscriptionId} with {Count} cars.",
+        logger.LogInformation(
+            "Sent subscription digest email to {Email} for subscription {SubscriptionId} with {Count} cars.",
             toEmail, subscription.Id, cars.Count);
     }
 

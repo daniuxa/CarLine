@@ -29,4 +29,3 @@ public sealed class Worker(ILogger<Worker> logger, IServiceProvider serviceProvi
         }
     }
 }
-

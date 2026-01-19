@@ -10,4 +10,3 @@ public sealed class MatchedCarDto
     public decimal? Price { get; init; }
     public string? Region { get; init; }
 }
-

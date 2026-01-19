@@ -9,27 +9,27 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Aspire.Hosting.AppHost" Version="13.1.0" />
-      <PackageReference Include="Aspire.Hosting.Azure.Functions" Version="13.1.0" />
-      <PackageReference Include="Aspire.Hosting.Azure.Storage" Version="13.1.0" />
-      <PackageReference Include="Aspire.Hosting.Elasticsearch" Version="13.0.0" />
-      <PackageReference Include="Aspire.Hosting.MongoDB" Version="13.1.0" />
-      <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.5.2" />
-      <PackageReference Include="Aspire.Hosting.SqlServer" Version="13.1.0" />
-      <PackageReference Include="CommunityToolkit.Aspire.Hosting.NodeJS.Extensions" Version="9.9.0" />
-      <PackageReference Include="CommunityToolkit.Aspire.Hosting.Sqlite" Version="13.0.0" />
+        <PackageReference Include="Aspire.Hosting.AppHost" Version="13.1.0"/>
+        <PackageReference Include="Aspire.Hosting.Azure.Functions" Version="13.1.0"/>
+        <PackageReference Include="Aspire.Hosting.Azure.Storage" Version="13.1.0"/>
+        <PackageReference Include="Aspire.Hosting.Elasticsearch" Version="13.0.0"/>
+        <PackageReference Include="Aspire.Hosting.MongoDB" Version="13.1.0"/>
+        <PackageReference Include="Aspire.Hosting.NodeJs" Version="9.5.2"/>
+        <PackageReference Include="Aspire.Hosting.SqlServer" Version="13.1.0"/>
+        <PackageReference Include="CommunityToolkit.Aspire.Hosting.NodeJS.Extensions" Version="9.9.0"/>
+        <PackageReference Include="CommunityToolkit.Aspire.Hosting.Sqlite" Version="13.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CarLine.API\CarLine.API.csproj" />
-      <ProjectReference Include="..\CarLine.Common\CarLine.Common.csproj" />
-      <ProjectReference Include="..\CarLine.Crawler\CarLine.Crawler.csproj" />
-      <ProjectReference Include="..\CarLine.DataCleanUp\CarLine.DataCleanUp.csproj" />
-      <ProjectReference Include="..\CarLine.ExternalCarSellerStub\CarLine.ExternalCarSellerStub.csproj" />
-      <ProjectReference Include="..\CarLine.MLInterferenceService\CarLine.MLInterferenceService.csproj" />
-      <ProjectReference Include="..\CarLine.PriceClassificationService\CarLine.PriceClassificationService.csproj" />
-      <ProjectReference Include="..\CarLine.SubscriptionService\CarLine.SubscriptionService.csproj" />
-      <ProjectReference Include="..\CarLine.TrainingFunction\CarLine.TrainingFunction.csproj" />
+        <ProjectReference Include="..\CarLine.API\CarLine.API.csproj"/>
+        <ProjectReference Include="..\CarLine.Common\CarLine.Common.csproj"/>
+        <ProjectReference Include="..\CarLine.Crawler\CarLine.Crawler.csproj"/>
+        <ProjectReference Include="..\CarLine.DataCleanUp\CarLine.DataCleanUp.csproj"/>
+        <ProjectReference Include="..\CarLine.ExternalCarSellerStub\CarLine.ExternalCarSellerStub.csproj"/>
+        <ProjectReference Include="..\CarLine.MLInterferenceService\CarLine.MLInterferenceService.csproj"/>
+        <ProjectReference Include="..\CarLine.PriceClassificationService\CarLine.PriceClassificationService.csproj"/>
+        <ProjectReference Include="..\CarLine.SubscriptionService\CarLine.SubscriptionService.csproj"/>
+        <ProjectReference Include="..\CarLine.TrainingFunction\CarLine.TrainingFunction.csproj"/>
     </ItemGroup>
 
 </Project>

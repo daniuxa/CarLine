@@ -1,5 +1,5 @@
-using CarLine.PriceClassificationService;
 using CarLine.Common.DependencyInjection;
+using CarLine.PriceClassificationService;
 using CarLine.PriceClassificationService.Services;
 
 var builder = Host.CreateApplicationBuilder(args);

@@ -1,5 +1,5 @@
-using CarLine.DataCleanUp;
 using CarLine.Common.DependencyInjection;
+using CarLine.DataCleanUp;
 using CarLine.DataCleanUp.Services;
 
 var builder = WebApplication.CreateBuilder(args);

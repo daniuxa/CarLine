@@ -7,10 +7,8 @@ namespace CarLine.DataCleanUp.Services.Cleanup;
 
 internal sealed class TrainingCsvWriter : IAsyncDisposable
 {
-    private readonly StreamWriter _writer;
     private readonly CsvWriter _csv;
-
-    public string FilePath { get; }
+    private readonly StreamWriter _writer;
 
     public TrainingCsvWriter(string filePath)
     {
@@ -33,6 +31,14 @@ internal sealed class TrainingCsvWriter : IAsyncDisposable
         _csv = new CsvWriter(_writer, csvConfig);
     }
 
+    public string FilePath { get; }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _csv.DisposeAsync();
+        await _writer.DisposeAsync();
+    }
+
     public async Task WriteHeaderAsync(IReadOnlyList<string> header)
     {
         foreach (var h in header)
@@ -53,11 +59,5 @@ internal sealed class TrainingCsvWriter : IAsyncDisposable
     {
         await _csv.FlushAsync();
         await _writer.FlushAsync();
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await _csv.DisposeAsync();
-        await _writer.DisposeAsync();
     }
 }

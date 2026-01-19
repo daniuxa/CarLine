@@ -73,9 +73,9 @@ public class DataCleanupService(
             await csvWriter.WriteHeaderAsync(csvHeader);
 
             using var cursor =
-                await mongo.Source.FindAsync(FilterDefinition<BsonDocument>.Empty, cancellationToken: cancellationToken);
+                await mongo.Source.FindAsync(FilterDefinition<BsonDocument>.Empty,
+                    cancellationToken: cancellationToken);
             while (await cursor.MoveNextAsync(cancellationToken))
-            {
                 foreach (var doc in cursor.Current)
                 {
                     rowsRead++;
@@ -98,10 +98,8 @@ public class DataCleanupService(
                         // Build cleaned BSON doc for ES from the full record (same selection as before)
                         var cleanedDoc = new BsonDocument();
                         foreach (var key in DataCleanupConstants.WebDisplayFields)
-                        {
                             if (fullRecord.TryGetValue(key, out var val) && !string.IsNullOrWhiteSpace(val))
                                 cleanedDoc[key] = val;
-                        }
 
                         if (mongoBatch.TryAddFromFullRecord(fullRecord, out var url) && url != null)
                         {
@@ -117,7 +115,8 @@ public class DataCleanupService(
 
                             if (mongoBatch.Count >= BatchSize)
                             {
-                                var batchInserted = await ProcessBatchAsync(mongo, mongoBatch, esBatch, elasticSearch, cancellationToken);
+                                var batchInserted = await ProcessBatchAsync(mongo, mongoBatch, esBatch, elasticSearch,
+                                    cancellationToken);
                                 inserted += batchInserted;
                             }
                         }
@@ -132,11 +131,11 @@ public class DataCleanupService(
                         logger.LogError(ex, "Error processing row {row}", rowsRead);
                     }
                 }
-            }
 
             if (mongoBatch.Count > 0)
             {
-                var finalInserted = await ProcessBatchAsync(mongo, mongoBatch, esBatch, elasticSearch, cancellationToken);
+                var finalInserted =
+                    await ProcessBatchAsync(mongo, mongoBatch, esBatch, elasticSearch, cancellationToken);
                 if (finalInserted > 0) inserted += finalInserted;
             }
 
@@ -162,7 +161,7 @@ public class DataCleanupService(
 
         await using (var fileStream = await OpenReadWithRetryAsync(tempCsvPath, logger, cancellationToken))
         {
-            await blobClient.UploadAsync(fileStream, overwrite: true, cancellationToken: cancellationToken);
+            await blobClient.UploadAsync(fileStream, true, cancellationToken);
         }
 
         logger.LogInformation("Uploaded to blob: {blob}", blobName);
@@ -201,10 +200,7 @@ public class DataCleanupService(
         var result = await mongo.BulkInsertIgnoreDuplicatesAsync(mongoBatch.Items, cancellationToken);
 
         var insertedCount = 0;
-        if (result != null)
-        {
-            insertedCount = (int)result.InsertedCount;
-        }
+        if (result != null) insertedCount = (int)result.InsertedCount;
 
         mongoBatch.Clear();
 
@@ -227,28 +223,52 @@ public class DataCleanupService(
 
         return insertedCount;
     }
-    
+
     private static CarDocument FromCleanedBson(BsonDocument cleanedDoc, string url)
     {
         return new CarDocument
         {
             Id = url,
-            Manufacturer = cleanedDoc.Contains("manufacturer") ? BsonValueConverters.ToStringValue(cleanedDoc["manufacturer"]) : string.Empty,
-            Model = cleanedDoc.Contains("model") ? BsonValueConverters.ToStringValue(cleanedDoc["model"]) : string.Empty,
-            Year = cleanedDoc.Contains("year") && int.TryParse(BsonValueConverters.ToStringValue(cleanedDoc["year"]), out var y) ? y : 0,
+            Manufacturer = cleanedDoc.Contains("manufacturer")
+                ? BsonValueConverters.ToStringValue(cleanedDoc["manufacturer"])
+                : string.Empty,
+            Model =
+                cleanedDoc.Contains("model") ? BsonValueConverters.ToStringValue(cleanedDoc["model"]) : string.Empty,
+            Year = cleanedDoc.Contains("year") &&
+                   int.TryParse(BsonValueConverters.ToStringValue(cleanedDoc["year"]), out var y)
+                ? y
+                : 0,
             Status = "ACTIVE",
-            Price = cleanedDoc.Contains("price") && decimal.TryParse(BsonValueConverters.ToStringValue(cleanedDoc["price"]), out var p) ? p : 0m,
-            Odometer = cleanedDoc.Contains("odometer") && int.TryParse(BsonValueConverters.ToStringValue(cleanedDoc["odometer"]), out var o) ? o : 0,
-            Transmission = cleanedDoc.Contains("transmission") ? BsonValueConverters.ToStringValue(cleanedDoc["transmission"]) : string.Empty,
-            Condition = cleanedDoc.Contains("condition") ? BsonValueConverters.ToStringValue(cleanedDoc["condition"]) : string.Empty,
+            Price = cleanedDoc.Contains("price") &&
+                    decimal.TryParse(BsonValueConverters.ToStringValue(cleanedDoc["price"]), out var p)
+                ? p
+                : 0m,
+            Odometer = cleanedDoc.Contains("odometer") &&
+                       int.TryParse(BsonValueConverters.ToStringValue(cleanedDoc["odometer"]), out var o)
+                ? o
+                : 0,
+            Transmission = cleanedDoc.Contains("transmission")
+                ? BsonValueConverters.ToStringValue(cleanedDoc["transmission"])
+                : string.Empty,
+            Condition = cleanedDoc.Contains("condition")
+                ? BsonValueConverters.ToStringValue(cleanedDoc["condition"])
+                : string.Empty,
             Fuel = cleanedDoc.Contains("fuel") ? BsonValueConverters.ToStringValue(cleanedDoc["fuel"]) : string.Empty,
             Type = cleanedDoc.Contains("type") ? BsonValueConverters.ToStringValue(cleanedDoc["type"]) : string.Empty,
             Region = cleanedDoc.Contains("region") ? BsonValueConverters.ToStringValue(cleanedDoc["region"]) : null,
             Url = url,
-            ImageUrl = cleanedDoc.Contains("image_url") ? BsonValueConverters.ToStringValue(cleanedDoc["image_url"]) : null,
+            ImageUrl = cleanedDoc.Contains("image_url")
+                ? BsonValueConverters.ToStringValue(cleanedDoc["image_url"])
+                : null,
             Vin = cleanedDoc.Contains("vin") ? BsonValueConverters.ToStringValue(cleanedDoc["vin"]) : null,
-            PaintColor = cleanedDoc.Contains("paint_color") ? BsonValueConverters.ToStringValue(cleanedDoc["paint_color"]) : null,
-            PostingDate = cleanedDoc.Contains("posting_date") && DateTime.TryParse(BsonValueConverters.ToStringValue(cleanedDoc["posting_date"]), out var pd) ? pd : null,
+            PaintColor = cleanedDoc.Contains("paint_color")
+                ? BsonValueConverters.ToStringValue(cleanedDoc["paint_color"])
+                : null,
+            PostingDate =
+                cleanedDoc.Contains("posting_date") &&
+                DateTime.TryParse(BsonValueConverters.ToStringValue(cleanedDoc["posting_date"]), out var pd)
+                    ? pd
+                    : null,
             FirstSeen = DateTime.UtcNow,
             LastSeen = DateTime.UtcNow
         };
@@ -278,7 +298,8 @@ public class DataCleanupService(
             catch (IOException ex) when (attempt < maxAttempts)
             {
                 var delay = initialDelayMs * (int)Math.Pow(2, attempt - 1);
-                logger.LogWarning(ex, "Failed to open '{path}' for upload (attempt {attempt}/{maxAttempts}). Retrying in {delay}ms...",
+                logger.LogWarning(ex,
+                    "Failed to open '{path}' for upload (attempt {attempt}/{maxAttempts}). Retrying in {delay}ms...",
                     path, attempt, maxAttempts, delay);
                 await Task.Delay(delay, cancellationToken);
             }

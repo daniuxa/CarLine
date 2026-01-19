@@ -6,7 +6,8 @@ namespace CarLine.Crawler.Services;
 public sealed class MongoCrawledCarsRepository(ILogger<MongoCrawledCarsRepository> logger, IMongoDatabase database)
     : ICrawledCarsRepository
 {
-    public async Task UpsertManyAsync(IEnumerable<ExternalCarListing> listings, string source, CancellationToken cancellationToken)
+    public async Task UpsertManyAsync(IEnumerable<ExternalCarListing> listings, string source,
+        CancellationToken cancellationToken)
     {
         var collection = database.GetCollection<BsonDocument>("crawled_cars");
         var now = DateTime.UtcNow;
@@ -48,7 +49,7 @@ public sealed class MongoCrawledCarsRepository(ILogger<MongoCrawledCarsRepositor
             await collection.BulkWriteAsync(
                 bulkOps,
                 new BulkWriteOptions { IsOrdered = false },
-                cancellationToken: cancellationToken);
+                cancellationToken);
         }
         catch (Exception ex)
         {

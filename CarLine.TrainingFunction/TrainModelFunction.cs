@@ -1,10 +1,10 @@
 using Azure.Storage.Blobs;
+using CarLine.Common;
 using CarLine.Common.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.ML;
 using Microsoft.ML.Trainers.LightGbm;
-using CarLine.Common;
 
 namespace CarLine.TrainingFunction;
 
@@ -66,7 +66,7 @@ public class TrainModelFunction(ILogger<TrainModelFunction> logger, BlobContaine
             var pipeline = catSteps.Any()
                 ? catSteps.Aggregate((a, b) => a.Append(b))
                 : _ml.Transforms.CopyColumns("Features", "year"); // fallback
-            
+
             pipeline = pipeline.Append(_ml.Transforms.Concatenate(
                 "Features",
                 "manufacturer_encoded",
@@ -100,7 +100,7 @@ public class TrainModelFunction(ILogger<TrainModelFunction> logger, BlobContaine
                 MaximumBinCountPerFeature = 255,
 
                 // Parallelism
-                NumberOfThreads =  Environment.ProcessorCount,
+                NumberOfThreads = Environment.ProcessorCount,
 
                 // Metrics
                 EvaluationMetric = LightGbmRegressionTrainer.Options.EvaluateMetricType.RootMeanSquaredError
@@ -125,7 +125,7 @@ public class TrainModelFunction(ILogger<TrainModelFunction> logger, BlobContaine
             logger.LogInformation("Uploading model to blob {blobName}", modelBlobName);
             await using (var modelStream = File.OpenRead(tempModelPath))
             {
-                await modelBlobClient.UploadAsync(modelStream, overwrite: true);
+                await modelBlobClient.UploadAsync(modelStream, true);
             }
 
             var duration = DateTime.UtcNow - startTime;

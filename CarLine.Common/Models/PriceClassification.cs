@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace CarLine.Common.Models;
+﻿namespace CarLine.Common.Models;
 
 public enum PriceClassification
 {
@@ -28,19 +25,12 @@ public static class PriceClassificationExtensions
 
     public static PriceClassification FromStorageString(string? value)
     {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return PriceClassification.Unknown;
-        }
+        if (string.IsNullOrWhiteSpace(value)) return PriceClassification.Unknown;
 
         var key = value.Trim();
         foreach (var pair in _storageNames)
-        {
             if (string.Equals(pair.Value, key, StringComparison.OrdinalIgnoreCase))
-            {
                 return pair.Key;
-            }
-        }
 
         return PriceClassification.Unknown;
     }

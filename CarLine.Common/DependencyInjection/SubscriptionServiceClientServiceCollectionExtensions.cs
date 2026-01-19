@@ -8,7 +8,8 @@ public static class SubscriptionServiceClientServiceCollectionExtensions
 {
     private const string DefaultBaseUrl = "http://localhost:5025";
 
-    public static IServiceCollection AddSubscriptionServiceClient(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddSubscriptionServiceClient(this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.AddHttpClient("SubscriptionService", (sp, httpClient) =>
         {
@@ -25,7 +26,9 @@ public static class SubscriptionServiceClientServiceCollectionExtensions
 
             if (!Uri.TryCreate(baseUrl, UriKind.Absolute, out var baseUri))
             {
-                logger.LogWarning("Subscription service URL '{value}' is not a valid absolute URI; falling back to {fallback}", baseUrl, DefaultBaseUrl);
+                logger.LogWarning(
+                    "Subscription service URL '{value}' is not a valid absolute URI; falling back to {fallback}",
+                    baseUrl, DefaultBaseUrl);
                 baseUri = new Uri(DefaultBaseUrl);
             }
 

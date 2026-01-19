@@ -8,13 +8,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.19.4" />
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
-        <PackageReference Include="MongoDB.Driver" Version="2.22.0" />
-        <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.1" />
+        <PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.19.4"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.1"/>
+        <PackageReference Include="MongoDB.Driver" Version="2.22.0"/>
+        <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.1"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CarLine.Common\CarLine.Common.csproj" />
+        <ProjectReference Include="..\CarLine.Common\CarLine.Common.csproj"/>
     </ItemGroup>
 </Project>

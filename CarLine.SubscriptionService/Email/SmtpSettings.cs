@@ -20,8 +20,8 @@ public sealed class SmtpSettings
     public string? Username { get; set; }
 
     /// <summary>
-    /// Preferred configuration: set TlsMode to StartTls (587) or SslOnConnect (465).
-    /// EnableSsl is kept for backward compatibility.
+    ///     Preferred configuration: set TlsMode to StartTls (587) or SslOnConnect (465).
+    ///     EnableSsl is kept for backward compatibility.
     /// </summary>
     public SmtpTlsMode TlsMode { get; set; } = SmtpTlsMode.StartTls;
 

@@ -12,10 +12,11 @@ builder.Services.AddOpenApi();
 
 // SQL Server (subscriptions DB)
 var sqlConnectionString = builder.Configuration.GetConnectionString("subscriptionsdb")
-                           ?? builder.Configuration.GetConnectionString("sqlserver")
-                           ?? builder.Configuration.GetConnectionString("subscriptions")
-                           ?? builder.Configuration["ConnectionStrings:subscriptionsdb"]
-                           ?? throw new InvalidOperationException("No connection string configured for subscriptionsdb.");
+                          ?? builder.Configuration.GetConnectionString("sqlserver")
+                          ?? builder.Configuration.GetConnectionString("subscriptions")
+                          ?? builder.Configuration["ConnectionStrings:subscriptionsdb"]
+                          ?? throw new InvalidOperationException(
+                              "No connection string configured for subscriptionsdb.");
 
 builder.Services.AddDbContext<SubscriptionDbContext>(options =>
     options.UseSqlServer(sqlConnectionString));
@@ -41,10 +42,7 @@ using (var scope = app.Services.CreateScope())
     await db.Database.EnsureCreatedAsync();
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
 app.UseHttpsRedirection();
 app.MapControllers();

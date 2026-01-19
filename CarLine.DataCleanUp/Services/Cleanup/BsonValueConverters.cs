@@ -4,7 +4,10 @@ namespace CarLine.DataCleanUp.Services.Cleanup;
 
 internal static class BsonValueConverters
 {
-    public static string ToTrimmedString(BsonValue val) => ToStringValue(val).Trim();
+    public static string ToTrimmedString(BsonValue val)
+    {
+        return ToStringValue(val).Trim();
+    }
 
     public static string ToStringValue(BsonValue val)
     {
@@ -19,4 +22,3 @@ internal static class BsonValueConverters
         };
     }
 }
-

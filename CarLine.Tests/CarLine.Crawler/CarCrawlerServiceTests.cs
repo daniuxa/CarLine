@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Text;
 using System.Text.Json;
 using CarLine.Crawler;
@@ -14,15 +13,22 @@ namespace CarLine.Tests.CarLine.Crawler;
 [TestFixture]
 public class CarCrawlerServiceTests
 {
-    private sealed class StubHttpMessageHandler(Func<HttpRequestMessage, HttpResponseMessage> handler) : HttpMessageHandler
+    private sealed class StubHttpMessageHandler(Func<HttpRequestMessage, HttpResponseMessage> handler)
+        : HttpMessageHandler
     {
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-            => Task.FromResult(handler(request));
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            return Task.FromResult(handler(request));
+        }
     }
 
     private sealed class StubHttpClientFactory(HttpClient client) : IHttpClientFactory
     {
-        public HttpClient CreateClient(string name) => client;
+        public HttpClient CreateClient(string name)
+        {
+            return client;
+        }
     }
 
     [Test]
@@ -132,7 +138,9 @@ public class CarCrawlerServiceTests
 
         await sut.FetchFromExternalApisAsync(CancellationToken.None);
 
-        repo.Verify(r => r.UpsertManyAsync(It.IsAny<IEnumerable<ExternalCarListing>>(), "api1", It.IsAny<CancellationToken>()), Times.Exactly(3));
+        repo.Verify(
+            r => r.UpsertManyAsync(It.IsAny<IEnumerable<ExternalCarListing>>(), "api1", It.IsAny<CancellationToken>()),
+            Times.Exactly(3));
         Assert.That(calls, Is.EqualTo(3));
     }
 

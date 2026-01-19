@@ -5,22 +5,20 @@ namespace CarLine.DataCleanUp.Services.Cleanup;
 
 internal sealed class MongoCleanupRepository
 {
-    private readonly IMongoCollection<BsonDocument> _sourceCollection;
-    private readonly IMongoCollection<BsonDocument> _cleanedCollection;
-
     public MongoCleanupRepository(IMongoClient mongoClient)
     {
         var database = mongoClient.GetDatabase("carsnosql");
-        _sourceCollection = database.GetCollection<BsonDocument>("crawled_cars");
-        _cleanedCollection = database.GetCollection<BsonDocument>("cleaned_cars");
+        Source = database.GetCollection<BsonDocument>("crawled_cars");
+        Cleaned = database.GetCollection<BsonDocument>("cleaned_cars");
     }
 
-    public IMongoCollection<BsonDocument> Source => _sourceCollection;
-    public IMongoCollection<BsonDocument> Cleaned => _cleanedCollection;
+    public IMongoCollection<BsonDocument> Source { get; }
+
+    public IMongoCollection<BsonDocument> Cleaned { get; }
 
     public async Task<BsonDocument?> FindFirstSourceAsync(CancellationToken cancellationToken)
     {
-        return await _sourceCollection.Find(FilterDefinition<BsonDocument>.Empty)
+        return await Source.Find(FilterDefinition<BsonDocument>.Empty)
             .Limit(1)
             .FirstOrDefaultAsync(cancellationToken);
     }
@@ -32,14 +30,15 @@ internal sealed class MongoCleanupRepository
             var indexKeys = Builders<BsonDocument>.IndexKeys.Ascending("url");
             var indexOptions = new CreateIndexOptions { Unique = true, Sparse = true, Name = "idx_url_unique" };
 
-            await _cleanedCollection.Indexes.CreateOneAsync(
+            await Cleaned.Indexes.CreateOneAsync(
                 new CreateIndexModel<BsonDocument>(indexKeys, indexOptions),
                 cancellationToken: cancellationToken
             );
 
             logger.LogInformation("Ensured unique index on 'url' field");
         }
-        catch (MongoCommandException ex) when (ex.CodeName == "IndexOptionsConflict" || ex.CodeName == "IndexKeySpecsConflict")
+        catch (MongoCommandException ex) when (ex.CodeName == "IndexOptionsConflict" ||
+                                               ex.CodeName == "IndexKeySpecsConflict")
         {
             logger.LogInformation("Index on 'url' already exists");
         }
@@ -55,10 +54,10 @@ internal sealed class MongoCleanupRepository
         try
         {
             // With a unique index on url, duplicates will error with E11000 but inserts continue because IsOrdered=false.
-            return await _cleanedCollection.BulkWriteAsync(
+            return await Cleaned.BulkWriteAsync(
                 batch,
                 new BulkWriteOptions { IsOrdered = false },
-                cancellationToken: cancellationToken
+                cancellationToken
             );
         }
         catch (MongoBulkWriteException<BsonDocument> ex)

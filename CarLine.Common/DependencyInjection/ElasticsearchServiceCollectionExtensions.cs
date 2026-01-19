@@ -1,5 +1,5 @@
-﻿using Elastic.Clients.Elasticsearch;
-using CarLine.Common.Models;
+﻿using CarLine.Common.Models;
+using Elastic.Clients.Elasticsearch;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -9,9 +9,10 @@ namespace CarLine.Common.DependencyInjection;
 public static class ElasticsearchServiceCollectionExtensions
 {
     /// <summary>
-    /// Registers an ElasticsearchClient using the existing config/env conventions in this solution.
+    ///     Registers an ElasticsearchClient using the existing config/env conventions in this solution.
     /// </summary>
-    public static IServiceCollection AddCarLineElasticsearch(this IServiceCollection services, IConfiguration configuration,
+    public static IServiceCollection AddCarLineElasticsearch(this IServiceCollection services,
+        IConfiguration configuration,
         string? connectionStringName = "elasticsearch",
         string fallbackConnectionString = "http://localhost:9200",
         bool disableDirectStreaming = false,
@@ -24,9 +25,7 @@ public static class ElasticsearchServiceCollectionExtensions
             string? conn = null;
 
             if (!string.IsNullOrWhiteSpace(connectionStringName))
-            {
                 conn = configuration.GetConnectionString(connectionStringName);
-            }
 
             conn ??= Environment.GetEnvironmentVariable("ConnectionStrings__elasticsearch");
             conn ??= fallbackConnectionString;
@@ -36,10 +35,7 @@ public static class ElasticsearchServiceCollectionExtensions
             var settings = new ElasticsearchClientSettings(new Uri(conn))
                 .DefaultIndex(defaultIndex);
 
-            if (disableDirectStreaming)
-            {
-                settings = settings.DisableDirectStreaming();
-            }
+            if (disableDirectStreaming) settings = settings.DisableDirectStreaming();
 
             return new ElasticsearchClient(settings);
         });
@@ -47,4 +43,3 @@ public static class ElasticsearchServiceCollectionExtensions
         return services;
     }
 }
-

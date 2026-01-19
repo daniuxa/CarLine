@@ -12,10 +12,6 @@ namespace CarLine.Tests.CarLine.API;
 [TestFixture]
 public class CarsSearchServiceTests
 {
-    private Mock<ICarLineElasticsearchClient> _es = null!;
-    private Mock<ILogger<CarsSearchService>> _logger = null!;
-    private CarsSearchService _sut = null!;
-
     [SetUp]
     public void SetUp()
     {
@@ -24,49 +20,62 @@ public class CarsSearchServiceTests
         _sut = new CarsSearchService(_es.Object, _logger.Object);
     }
 
+    private Mock<ICarLineElasticsearchClient> _es = null!;
+    private Mock<ILogger<CarsSearchService>> _logger = null!;
+    private CarsSearchService _sut = null!;
+
     [Test]
     public async Task SearchAsync_facetsFalse_returnsCarsAndPaging_withoutFacets()
     {
         var docs = new List<CarDocument>
         {
-            new() { Manufacturer = "Toyota", Model = "Corolla", Year = 2018, Status = "ACTIVE", Price = 12000, LastSeen = DateTime.UtcNow },
-            new() { Manufacturer = "Honda", Model = "Civic", Year = 2019, Status = "ACTIVE", Price = 13000, LastSeen = DateTime.UtcNow }
+            new()
+            {
+                Manufacturer = "Toyota", Model = "Corolla", Year = 2018, Status = "ACTIVE", Price = 12000,
+                LastSeen = DateTime.UtcNow
+            },
+            new()
+            {
+                Manufacturer = "Honda", Model = "Civic", Year = 2019, Status = "ACTIVE", Price = 13000,
+                LastSeen = DateTime.UtcNow
+            }
         };
 
         var response = new CarLineSearchResponse<CarDocument>(
-            IsValid: true,
-            Total: 123,
-            Documents: docs,
-            Aggregations: null);
+            true,
+            123,
+            docs,
+            null);
 
         _es
-            .Setup(x => x.SearchAsync<CarDocument>(It.IsAny<Action<SearchRequestDescriptor<CarDocument>>>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.SearchAsync<CarDocument>(It.IsAny<Action<SearchRequestDescriptor<CarDocument>>>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(response);
 
         var result = await _sut.SearchAsync(
-            q: null,
-            status: null,
-            priceClassification: null,
-            manufacturer: null,
-            model: null,
-            fuel: null,
-            transmission: null,
-            condition: null,
-            type: null,
-            minPrice: null,
-            maxPrice: null,
-            priceFrom: null,
-            priceTo: null,
-            minYear: null,
-            maxYear: null,
-            yearFrom: null,
-            yearTo: null,
-            odometerFrom: null,
-            odometerTo: null,
-            region: null,
-            page: 2,
-            pageSize: 10,
-            facets: false);
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            2,
+            10,
+            false);
 
         Assert.That(result.Total, Is.EqualTo(123));
         Assert.That(result.Page, Is.EqualTo(2));
@@ -75,7 +84,8 @@ public class CarsSearchServiceTests
         Assert.That(result.Facets, Is.Null);
 
         _es.Verify(
-            x => x.SearchAsync<CarDocument>(It.IsAny<Action<SearchRequestDescriptor<CarDocument>>>(), It.IsAny<CancellationToken>()),
+            x => x.SearchAsync<CarDocument>(It.IsAny<Action<SearchRequestDescriptor<CarDocument>>>(),
+                It.IsAny<CancellationToken>()),
             Times.Once);
     }
 
@@ -84,7 +94,11 @@ public class CarsSearchServiceTests
     {
         var docs = new List<CarDocument>
         {
-            new() { Manufacturer = "Toyota", Model = "Corolla", Year = 2018, Status = "ACTIVE", Price = 12000, LastSeen = DateTime.UtcNow }
+            new()
+            {
+                Manufacturer = "Toyota", Model = "Corolla", Year = 2018, Status = "ACTIVE", Price = 12000,
+                LastSeen = DateTime.UtcNow
+            }
         };
 
         var aggregations = ElasticTestResponses.CreateAggregations(
@@ -98,39 +112,40 @@ public class CarsSearchServiceTests
         );
 
         var response = new CarLineSearchResponse<CarDocument>(
-            IsValid: true,
-            Total: 1,
-            Documents: docs,
-            Aggregations: aggregations);
+            true,
+            1,
+            docs,
+            aggregations);
 
         _es
-            .Setup(x => x.SearchAsync<CarDocument>(It.IsAny<Action<SearchRequestDescriptor<CarDocument>>>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.SearchAsync<CarDocument>(It.IsAny<Action<SearchRequestDescriptor<CarDocument>>>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(response);
 
         var result = await _sut.SearchAsync(
-            q: null,
-            status: null,
-            priceClassification: null,
-            manufacturer: null,
-            model: null,
-            fuel: null,
-            transmission: null,
-            condition: null,
-            type: null,
-            minPrice: null,
-            maxPrice: null,
-            priceFrom: null,
-            priceTo: null,
-            minYear: null,
-            maxYear: null,
-            yearFrom: null,
-            yearTo: null,
-            odometerFrom: null,
-            odometerTo: null,
-            region: null,
-            page: 1,
-            pageSize: 10,
-            facets: true);
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            1,
+            10,
+            true);
 
         Assert.That(result.Facets, Is.Not.Null);
 
@@ -150,7 +165,11 @@ public class CarsSearchServiceTests
     {
         var docs = new List<CarDocument>
         {
-            new() { Manufacturer = "Toyota", Model = "Corolla", Year = 2018, Status = "ACTIVE", Price = 12000, LastSeen = DateTime.UtcNow }
+            new()
+            {
+                Manufacturer = "Toyota", Model = "Corolla", Year = 2018, Status = "ACTIVE", Price = 12000,
+                LastSeen = DateTime.UtcNow
+            }
         };
 
         var toyotaBucket = new StringTermsBucket
@@ -164,7 +183,7 @@ public class CarsSearchServiceTests
         var hondaBucket = new StringTermsBucket
         {
             Key = "Honda",
-            DocCount = 5,
+            DocCount = 5
         };
 
         var manufacturerAgg = new StringTermsAggregate
@@ -176,39 +195,40 @@ public class CarsSearchServiceTests
             ("manufacturer_facet", manufacturerAgg));
 
         var response = new CarLineSearchResponse<CarDocument>(
-            IsValid: true,
-            Total: 1,
-            Documents: docs,
-            Aggregations: aggregations);
+            true,
+            1,
+            docs,
+            aggregations);
 
         _es
-            .Setup(x => x.SearchAsync<CarDocument>(It.IsAny<Action<SearchRequestDescriptor<CarDocument>>>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.SearchAsync<CarDocument>(It.IsAny<Action<SearchRequestDescriptor<CarDocument>>>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(response);
 
         var result = await _sut.SearchAsync(
-            q: null,
-            status: null,
-            priceClassification: null,
-            manufacturer: null,
-            model: null,
-            fuel: null,
-            transmission: null,
-            condition: null,
-            type: null,
-            minPrice: null,
-            maxPrice: null,
-            priceFrom: null,
-            priceTo: null,
-            minYear: null,
-            maxYear: null,
-            yearFrom: null,
-            yearTo: null,
-            odometerFrom: null,
-            odometerTo: null,
-            region: null,
-            page: 1,
-            pageSize: 10,
-            facets: true);
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            1,
+            10,
+            true);
 
         Assert.That(result.Facets, Is.Not.Null);
 
@@ -227,40 +247,41 @@ public class CarsSearchServiceTests
     public void SearchAsync_invalidResponse_throwsInvalidOperationException()
     {
         var response = new CarLineSearchResponse<CarDocument>(
-            IsValid: false,
-            Total: 0,
-            Documents: Array.Empty<CarDocument>(),
-            Aggregations: null);
+            false,
+            0,
+            Array.Empty<CarDocument>(),
+            null);
 
         _es
-            .Setup(x => x.SearchAsync<CarDocument>(It.IsAny<Action<SearchRequestDescriptor<CarDocument>>>(), It.IsAny<CancellationToken>()))
+            .Setup(x => x.SearchAsync<CarDocument>(It.IsAny<Action<SearchRequestDescriptor<CarDocument>>>(),
+                It.IsAny<CancellationToken>()))
             .ReturnsAsync(response);
 
         Assert.That(
             async () => await _sut.SearchAsync(
-                q: null,
-                status: null,
-                priceClassification: null,
-                manufacturer: null,
-                model: null,
-                fuel: null,
-                transmission: null,
-                condition: null,
-                type: null,
-                minPrice: null,
-                maxPrice: null,
-                priceFrom: null,
-                priceTo: null,
-                minYear: null,
-                maxYear: null,
-                yearFrom: null,
-                yearTo: null,
-                odometerFrom: null,
-                odometerTo: null,
-                region: null,
-                page: 1,
-                pageSize: 10,
-                facets: false),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                1,
+                10,
+                false),
             Throws.TypeOf<InvalidOperationException>().With.Message.EqualTo("Search failed"));
     }
 

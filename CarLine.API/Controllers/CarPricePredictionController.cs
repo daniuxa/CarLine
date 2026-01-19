@@ -10,10 +10,11 @@ namespace CarLine.API.Controllers;
 public class CarPricePredictionController(IMlInferenceClient mlClient, ILogger<CarPricePredictionController> logger)
     : ControllerBase
 {
-    private readonly ILogger<CarPricePredictionController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly ILogger<CarPricePredictionController> _logger =
+        logger ?? throw new ArgumentNullException(nameof(logger));
 
     /// <summary>
-    /// Estimate car price using the ML model
+    ///     Estimate car price using the ML model
     /// </summary>
     [HttpPost("estimate")]
     public async Task<IActionResult> EstimatePrice([FromBody] CarPriceEstimateRequest request)
@@ -37,9 +38,7 @@ public class CarPricePredictionController(IMlInferenceClient mlClient, ILogger<C
             var result = await mlClient.PredictAsync(mlRequest, HttpContext.RequestAborted);
 
             if (result?.PredictedPrice == null)
-            {
                 return BadRequest(new { error = "Invalid prediction response from ML service" });
-            }
 
             return Ok(new CarPriceEstimateResponse
             {

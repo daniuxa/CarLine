@@ -47,4 +47,3 @@ public class CarsController(CarInventoryService inventory) : ControllerBase
         return Ok(cars);
     }
 }
-

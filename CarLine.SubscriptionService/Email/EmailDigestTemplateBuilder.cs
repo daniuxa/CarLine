@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using CarLine.SubscriptionService.Data.Entities;
+﻿using CarLine.SubscriptionService.Data.Entities;
 using CarLine.SubscriptionService.Models;
 
 namespace CarLine.SubscriptionService.Email;
@@ -28,23 +26,17 @@ public sealed class EmailDigestTemplateBuilder : ISubscriptionDigestTemplateBuil
             $"- Type: {subscription.Type ?? "(any)"}",
             $"- Region: {subscription.Region ?? "(any)"}",
             "",
-            "New cars:",
+            "New cars:"
         };
 
         foreach (var car in cars.Take(50))
         {
             var price = car.Price.HasValue ? $"{car.Price.Value:C}" : "(price n/a)";
             lines.Add($"- {car.Manufacturer} {car.Model} {car.Year} | {price} | {car.Region ?? "(region n/a)"}");
-            if (!string.IsNullOrWhiteSpace(car.Url))
-            {
-                lines.Add($"  {car.Url}");
-            }
+            if (!string.IsNullOrWhiteSpace(car.Url)) lines.Add($"  {car.Url}");
         }
 
-        if (cars.Count > 50)
-        {
-            lines.Add($"...and {cars.Count - 50} more");
-        }
+        if (cars.Count > 50) lines.Add($"...and {cars.Count - 50} more");
 
         lines.Add(string.Empty);
         lines.Add("Thanks,");

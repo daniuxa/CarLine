@@ -4,11 +4,9 @@ namespace CarLine.SubscriptionService.Data.Entities;
 
 public sealed class SubscriptionEntity
 {
-    [Key]
-    public Guid Id { get; set; }
+    [Key] public Guid Id { get; set; }
 
-    [MaxLength(320)]
-    public string Email { get; set; } = string.Empty;
+    [MaxLength(320)] public string Email { get; set; } = string.Empty;
 
     public string? Manufacturer { get; set; }
     public string? Model { get; set; }
@@ -31,4 +29,3 @@ public sealed class SubscriptionEntity
 
     public List<SubscriptionNotificationEntity> Notifications { get; set; } = new();
 }
-

@@ -8,10 +8,10 @@ namespace CarLine.PriceClassificationService.Services;
 
 public class PriceClassificationService
 {
+    private const int BatchSize = 1000;
+    private readonly BatchProcessor _batchProcessor;
     private readonly IMongoCollection<BsonDocument> _carsCollection;
     private readonly ILogger<PriceClassificationService> _logger;
-    private readonly BatchProcessor _batchProcessor;
-    private const int BatchSize = 1000;
 
     public PriceClassificationService(
         IMongoClient mongoClient,
@@ -36,12 +36,13 @@ public class PriceClassificationService
     {
         _logger.LogInformation("Starting price classification for all cars...");
         var startTime = DateTime.UtcNow;
-        
+
         int processed = 0, classified = 0, errors = 0;
 
         try
         {
-            _logger.LogInformation("Attempting to connect to MongoDB collection: {collection}", _carsCollection.CollectionNamespace.FullName);
+            _logger.LogInformation("Attempting to connect to MongoDB collection: {collection}",
+                _carsCollection.CollectionNamespace.FullName);
 
             // Find all cars without price classification or that need reclassification
             var filter = FilterDefinition<BsonDocument>.Empty;
@@ -65,7 +66,6 @@ public class PriceClassificationService
             var carBatch = new List<(BsonDocument doc, CarPredictionRequestData data)>();
 
             while (await cursor.MoveNextAsync(cancellationToken))
-            {
                 foreach (var car in cursor.Current)
                 {
                     if (cancellationToken.IsCancellationRequested)
@@ -73,8 +73,8 @@ public class PriceClassificationService
 
                     // Extract car data
                     if (TryExtractCarData(car, out var manufacturer, out var model, out var year,
-                        out var odometer, out var transmission, out var condition, out var fuel,
-                        out var type, out var region, out var actualPrice, out var status) && status == "ACTIVE") 
+                            out var odometer, out var transmission, out var condition, out var fuel,
+                            out var type, out var region, out var actualPrice, out var status) && status == "ACTIVE")
                     {
                         carBatch.Add((car, new CarPredictionRequestData
                         {
@@ -93,7 +93,8 @@ public class PriceClassificationService
                         // Process batch when full
                         if (carBatch.Count >= BatchSize)
                         {
-                            var (batchClassified, batchErrors, batchProcessed) = await ProcessAndLogBatchAsync(carBatch, totalCars, processed, classified, errors, cancellationToken);
+                            var (batchClassified, batchErrors, batchProcessed) = await ProcessAndLogBatchAsync(carBatch,
+                                totalCars, processed, classified, errors, cancellationToken);
                             classified += batchClassified;
                             errors += batchErrors;
                             processed += batchProcessed;
@@ -107,17 +108,18 @@ public class PriceClassificationService
                         processed++;
                     }
                 }
-            }
 
             // Process remaining cars in final batch
             if (carBatch.Count > 0)
             {
-                var (batchClassified, batchErrors, batchProcessed) = await ProcessAndLogBatchAsync(carBatch, totalCars, processed, classified, errors, cancellationToken);
+                var (batchClassified, batchErrors, batchProcessed) = await ProcessAndLogBatchAsync(carBatch, totalCars,
+                    processed, classified, errors, cancellationToken);
                 classified += batchClassified;
                 errors += batchErrors;
                 processed += batchProcessed;
 
-                _logger.LogInformation("Final batch: {processed}/{total} cars processed, {classified} classified, {errors} errors",
+                _logger.LogInformation(
+                    "Final batch: {processed}/{total} cars processed, {classified} classified, {errors} errors",
                     processed, totalCars, classified, errors);
             }
 
@@ -128,7 +130,8 @@ public class PriceClassificationService
         }
         catch (TimeoutException ex)
         {
-            _logger.LogError(ex, "MongoDB connection timeout. Please check: 1) MongoDB is running, 2) Connection string is correct, 3) Network connectivity");
+            _logger.LogError(ex,
+                "MongoDB connection timeout. Please check: 1) MongoDB is running, 2) Connection string is correct, 3) Network connectivity");
             throw;
         }
         catch (MongoException ex)
@@ -162,9 +165,7 @@ public class PriceClassificationService
                 !car.Contains("odometer") || !car.Contains("price") ||
                 !car.Contains("transmission") || !car.Contains("condition") ||
                 !car.Contains("fuel") || !car.Contains("type") || !car.Contains("status"))
-            {
                 return false;
-            }
 
             manufacturer = car["manufacturer"].AsString;
             model = car["model"].AsString;
@@ -209,10 +210,7 @@ public class PriceClassificationService
             type = car["type"].AsString;
 
             // Optional field
-            if (car.Contains("region") && !car["region"].IsBsonNull)
-            {
-                region = car["region"].AsString;
-            }
+            if (car.Contains("region") && !car["region"].IsBsonNull) region = car["region"].AsString;
 
             return !string.IsNullOrWhiteSpace(manufacturer) &&
                    !string.IsNullOrWhiteSpace(model) &&

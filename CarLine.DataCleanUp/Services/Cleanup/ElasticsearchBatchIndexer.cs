@@ -61,7 +61,8 @@ internal sealed class ElasticsearchBatchIndexer(ILogger logger, ElasticsearchCli
 
         await Task.WhenAll(tasks);
 
-        logger.LogInformation("Elasticsearch create-only summary: {created} created, {exists} already existed, {failed} failed",
+        logger.LogInformation(
+            "Elasticsearch create-only summary: {created} created, {exists} already existed, {failed} failed",
             created, alreadyExists, failed);
     }
 }

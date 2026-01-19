@@ -16,16 +16,12 @@ public class Worker(
         await RunClassificationAsync(stoppingToken);
 
         while (!stoppingToken.IsCancellationRequested)
-        {
             try
             {
                 logger.LogInformation("Next classification run scheduled in {hours} hours", runIntervalHours);
                 await Task.Delay(runInterval, stoppingToken);
 
-                if (!stoppingToken.IsCancellationRequested)
-                {
-                    await RunClassificationAsync(stoppingToken);
-                }
+                if (!stoppingToken.IsCancellationRequested) await RunClassificationAsync(stoppingToken);
             }
             catch (TaskCanceledException)
             {
@@ -37,7 +33,6 @@ public class Worker(
                 logger.LogError(ex, "Error in classification worker loop");
                 await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
             }
-        }
     }
 
     private async Task RunClassificationAsync(CancellationToken stoppingToken)
@@ -54,4 +49,3 @@ public class Worker(
         }
     }
 }
-

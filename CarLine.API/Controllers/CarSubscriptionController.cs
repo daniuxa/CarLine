@@ -5,7 +5,8 @@ namespace CarLine.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CarSubscriptionController(IHttpClientFactory httpClientFactory, ILogger<CarSubscriptionController> logger) : ControllerBase
+public class CarSubscriptionController(IHttpClientFactory httpClientFactory, ILogger<CarSubscriptionController> logger)
+    : ControllerBase
 {
     private readonly HttpClient _httpClient = httpClientFactory.CreateClient("SubscriptionService");
 
@@ -21,7 +22,7 @@ public class CarSubscriptionController(IHttpClientFactory httpClientFactory, ILo
             return StatusCode((int)response.StatusCode, body);
         }
 
-        var dto = await response.Content.ReadFromJsonAsync<CarSubscriptionDto>(cancellationToken: cancellationToken);
+        var dto = await response.Content.ReadFromJsonAsync<CarSubscriptionDto>(cancellationToken);
         return Ok(dto);
     }
 
@@ -29,14 +30,15 @@ public class CarSubscriptionController(IHttpClientFactory httpClientFactory, ILo
     public async Task<ActionResult<List<CarSubscriptionDto>>> GetByEmail([FromQuery] string email,
         CancellationToken cancellationToken)
     {
-        var response = await _httpClient.GetAsync($"api/subscriptions?email={Uri.EscapeDataString(email)}", cancellationToken);
+        var response =
+            await _httpClient.GetAsync($"api/subscriptions?email={Uri.EscapeDataString(email)}", cancellationToken);
         if (!response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadAsStringAsync(cancellationToken);
             return StatusCode((int)response.StatusCode, body);
         }
 
-        var list = await response.Content.ReadFromJsonAsync<List<CarSubscriptionDto>>(cancellationToken: cancellationToken);
+        var list = await response.Content.ReadFromJsonAsync<List<CarSubscriptionDto>>(cancellationToken);
         return Ok(list ?? new List<CarSubscriptionDto>());
     }
 

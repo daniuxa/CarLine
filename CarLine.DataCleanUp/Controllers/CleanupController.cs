@@ -7,8 +7,8 @@ namespace CarLine.DataCleanUp.Controllers;
 [Route("api/[controller]")]
 public class CleanupController : ControllerBase
 {
-    private readonly ILogger<CleanupController> _logger;
     private readonly DataCleanupService _cleanupService;
+    private readonly ILogger<CleanupController> _logger;
 
     public CleanupController(ILogger<CleanupController> logger, DataCleanupService cleanupService)
     {
@@ -26,4 +26,3 @@ public class CleanupController : ControllerBase
         return StatusCode(500, result);
     }
 }
-

@@ -11,7 +11,10 @@ internal sealed class MongoUpsertBatch
     public int Count => _batch.Count;
     public IReadOnlyList<WriteModel<BsonDocument>> Items => _batch;
 
-    public void Clear() => _batch.Clear();
+    public void Clear()
+    {
+        _batch.Clear();
+    }
 
     public bool TryAddFromFullRecord(Dictionary<string, string> fullRecord, out string? url)
     {
@@ -20,10 +23,8 @@ internal sealed class MongoUpsertBatch
         // Prepare MongoDB document (includes web display fields + core fields)
         var cleanedDoc = new BsonDocument();
         foreach (var key in DataCleanupConstants.WebDisplayFields)
-        {
             if (fullRecord.TryGetValue(key, out var val) && !string.IsNullOrWhiteSpace(val))
                 cleanedDoc[key] = val;
-        }
 
         if (cleanedDoc.ElementCount == 0)
             return false;

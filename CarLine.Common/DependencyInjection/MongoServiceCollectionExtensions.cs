@@ -8,7 +8,7 @@ namespace CarLine.Common.DependencyInjection;
 public static class MongoServiceCollectionExtensions
 {
     /// <summary>
-    /// Registers a shared MongoDB IMongoClient using common config/env conventions in this solution.
+    ///     Registers a shared MongoDB IMongoClient using common config/env conventions in this solution.
     /// </summary>
     public static IServiceCollection AddCarLineMongoClient(
         this IServiceCollection services,
@@ -22,7 +22,7 @@ public static class MongoServiceCollectionExtensions
             var logger = sp.GetRequiredService<ILoggerFactory>().CreateLogger("MongoClient");
 
             // Prefer explicit config key if provided (lets each service override its own settings section)
-            string? conn = !string.IsNullOrWhiteSpace(configurationKey) ? configuration[configurationKey] : null;
+            var conn = !string.IsNullOrWhiteSpace(configurationKey) ? configuration[configurationKey] : null;
 
             // Common connection string sources across services
             conn ??= configuration.GetConnectionString("mongodb");
@@ -40,7 +40,9 @@ public static class MongoServiceCollectionExtensions
                 if (allowLocalFallback)
                 {
                     conn = fallbackConnectionString;
-                    logger.LogWarning("MongoDB connection string not found in configuration. Using fallback: {ConnectionString}", conn);
+                    logger.LogWarning(
+                        "MongoDB connection string not found in configuration. Using fallback: {ConnectionString}",
+                        conn);
                 }
                 else
                 {
@@ -61,7 +63,7 @@ public static class MongoServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Registers an IMongoDatabase based on the provided database name.
+    ///     Registers an IMongoDatabase based on the provided database name.
     /// </summary>
     public static IServiceCollection AddCarLineMongoDatabase(this IServiceCollection services, string databaseName)
     {

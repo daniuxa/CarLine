@@ -7,7 +7,8 @@ namespace CarLine.Common.DependencyInjection;
 
 public static class MlInferenceClientServiceCollectionExtensions
 {
-    public static IServiceCollection AddMlInferenceClient(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddMlInferenceClient(this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.AddHttpClient<IMlInferenceClient, MlInferenceClient>((sp, httpClient) =>
         {
@@ -25,7 +26,9 @@ public static class MlInferenceClientServiceCollectionExtensions
 
             if (!Uri.TryCreate(mlServiceUrl, UriKind.Absolute, out var baseUri))
             {
-                logger.LogWarning("ML service URL '{value}' is not a valid absolute URI; falling back to http://localhost:5000", mlServiceUrl);
+                logger.LogWarning(
+                    "ML service URL '{value}' is not a valid absolute URI; falling back to http://localhost:5000",
+                    mlServiceUrl);
                 baseUri = new Uri("http://localhost:5000");
             }
 
@@ -38,4 +41,3 @@ public static class MlInferenceClientServiceCollectionExtensions
         return services;
     }
 }
-

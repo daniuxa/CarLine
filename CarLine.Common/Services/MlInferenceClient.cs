@@ -5,7 +5,8 @@ namespace CarLine.Common.Services;
 
 public sealed class MlInferenceClient(HttpClient httpClient) : IMlInferenceClient
 {
-    public async Task<PredictionResponse?> PredictAsync(CarPredictionRequest request, CancellationToken cancellationToken = default)
+    public async Task<PredictionResponse?> PredictAsync(CarPredictionRequest request,
+        CancellationToken cancellationToken = default)
     {
         using var response = await httpClient.PostAsJsonAsync("/api/CarPrediction/predict", request, cancellationToken);
         response.EnsureSuccessStatusCode();
@@ -13,9 +14,11 @@ public sealed class MlInferenceClient(HttpClient httpClient) : IMlInferenceClien
         return await response.Content.ReadFromJsonAsync<PredictionResponse>(cancellationToken);
     }
 
-    public async Task<BatchPredictionResponse?> PredictBatchAsync(IReadOnlyCollection<CarPredictionRequest> requests, CancellationToken cancellationToken = default)
+    public async Task<BatchPredictionResponse?> PredictBatchAsync(IReadOnlyCollection<CarPredictionRequest> requests,
+        CancellationToken cancellationToken = default)
     {
-        using var response = await httpClient.PostAsJsonAsync("/api/CarPrediction/predict/batch", requests, cancellationToken);
+        using var response =
+            await httpClient.PostAsJsonAsync("/api/CarPrediction/predict/batch", requests, cancellationToken);
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<BatchPredictionResponse>(cancellationToken);
@@ -27,4 +30,3 @@ public sealed class MlInferenceClient(HttpClient httpClient) : IMlInferenceClien
         return response.IsSuccessStatusCode;
     }
 }
-

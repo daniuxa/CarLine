@@ -1,12 +1,13 @@
 using CarLine.DataCleanUp.Services;
-using MongoDB.Driver;
 
 namespace CarLine.DataCleanUp;
 
 public class Worker(ILogger<Worker> logger, IServiceProvider serviceProvider) : BackgroundService
 {
     private readonly ILogger<Worker> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    private readonly IServiceProvider _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+
+    private readonly IServiceProvider _serviceProvider =
+        serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -17,18 +18,15 @@ public class Worker(ILogger<Worker> logger, IServiceProvider serviceProvider) : 
             {
                 using var scope = _serviceProvider.CreateScope();
                 var cleanupService = scope.ServiceProvider.GetRequiredService<DataCleanupService>();
-                
+
                 var result = await cleanupService.RunCleanupAsync(stoppingToken);
-                
+
                 if (result.Success)
-                {
-                    _logger.LogInformation("Cleanup completed: {Written} rows written, {Dropped} dropped, {Errors} errors in {Duration}. Blob: {Blob}", 
+                    _logger.LogInformation(
+                        "Cleanup completed: {Written} rows written, {Dropped} dropped, {Errors} errors in {Duration}. Blob: {Blob}",
                         result.RowsWritten, result.RowsDropped, result.Errors, result.Duration, result.BlobName);
-                }
                 else
-                {
                     _logger.LogWarning("Cleanup failed: {Message}", result.Message);
-                }
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {
@@ -44,4 +42,3 @@ public class Worker(ILogger<Worker> logger, IServiceProvider serviceProvider) : 
         }
     }
 }
-

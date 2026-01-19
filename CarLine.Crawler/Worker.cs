@@ -1,5 +1,5 @@
-using Microsoft.Extensions.Options;
 using CarLine.Crawler.Services;
+using Microsoft.Extensions.Options;
 
 namespace CarLine.Crawler;
 

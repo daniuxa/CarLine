@@ -1,7 +1,7 @@
-﻿using CarLine.Common.Models;
+﻿using System.Text.RegularExpressions;
+using CarLine.Common.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
-using System.Text.RegularExpressions;
 
 namespace CarLine.SubscriptionService.Services;
 
@@ -13,12 +13,13 @@ public sealed class MongoCarsRepository(IMongoClient mongoClient, IConfiguration
         PriceClassification.Normal.ToStorageString()
     };
 
-    private readonly IMongoDatabase _db = mongoClient.GetDatabase(configuration["MongoDB:Database"]
-                                                                  ?? configuration["CarsMongo:Database"]
-                                                                  ?? "carsnosql");
     private readonly string _collectionName = configuration["MongoDB:CarsCollection"]
                                               ?? configuration["CarsMongo:CarsCollection"]
                                               ?? "cleaned_cars";
+
+    private readonly IMongoDatabase _db = mongoClient.GetDatabase(configuration["MongoDB:Database"]
+                                                                  ?? configuration["CarsMongo:Database"]
+                                                                  ?? "carsnosql");
 
     public async Task<List<BsonDocument>> FindNewCarsForSubscriptionAsync(
         DateTime sinceUtc,

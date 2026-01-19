@@ -67,23 +67,26 @@ public sealed class SubscriptionsController(SubscriptionDbContext db) : Controll
         return NoContent();
     }
 
-    private static CarSubscriptionDto ToDto(SubscriptionEntity entity) => new()
+    private static CarSubscriptionDto ToDto(SubscriptionEntity entity)
     {
-        Id = entity.Id,
-        Email = entity.Email,
-        Manufacturer = entity.Manufacturer,
-        Model = entity.Model,
-        YearFrom = entity.YearFrom,
-        YearTo = entity.YearTo,
-        OdometerFrom = entity.OdometerFrom,
-        OdometerTo = entity.OdometerTo,
-        Condition = entity.Condition,
-        Fuel = entity.Fuel,
-        Transmission = entity.Transmission,
-        Type = entity.Type,
-        Region = entity.Region,
-        CreatedAtUtc = entity.CreatedAtUtc,
-        SinceUtc = entity.SinceUtc,
-        IsActive = entity.IsActive
-    };
+        return new CarSubscriptionDto
+        {
+            Id = entity.Id,
+            Email = entity.Email,
+            Manufacturer = entity.Manufacturer,
+            Model = entity.Model,
+            YearFrom = entity.YearFrom,
+            YearTo = entity.YearTo,
+            OdometerFrom = entity.OdometerFrom,
+            OdometerTo = entity.OdometerTo,
+            Condition = entity.Condition,
+            Fuel = entity.Fuel,
+            Transmission = entity.Transmission,
+            Type = entity.Type,
+            Region = entity.Region,
+            CreatedAtUtc = entity.CreatedAtUtc,
+            SinceUtc = entity.SinceUtc,
+            IsActive = entity.IsActive
+        };
+    }
 }

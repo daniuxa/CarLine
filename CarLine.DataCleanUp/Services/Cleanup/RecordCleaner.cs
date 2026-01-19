@@ -152,7 +152,7 @@ internal static class RecordCleaner
     }
 
     /// <summary>
-    /// Normalize model name by taking only the first word.
+    ///     Normalize model name by taking only the first word.
     /// </summary>
     private static string NormalizeModelName(string model)
     {
@@ -166,4 +166,3 @@ internal static class RecordCleaner
         return firstWord ?? string.Empty;
     }
 }
-

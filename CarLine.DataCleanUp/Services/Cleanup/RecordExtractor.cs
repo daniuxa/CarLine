@@ -28,14 +28,11 @@ internal static class RecordExtractor
         var record = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var col in csvHeader)
-        {
             if (doc.TryGetValue(col, out var val) && !val.IsBsonNull)
                 record[col] = BsonValueConverters.ToTrimmedString(val);
             else
                 record[col] = string.Empty;
-        }
 
         return record;
     }
 }
-

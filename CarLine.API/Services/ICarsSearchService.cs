@@ -1,5 +1,4 @@
 ﻿using CarLine.API.Models;
-using CarLine.Common.Models;
 
 namespace CarLine.API.Services;
 
@@ -30,4 +29,3 @@ public interface ICarsSearchService
         int pageSize,
         bool facets);
 }
-

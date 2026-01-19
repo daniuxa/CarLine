@@ -7,10 +7,11 @@ public static class ElasticsearchHelper
 {
     public const string CarsIndexName = "cars";
 
-    public static async Task EnsureIndexExistsAsync(ElasticsearchClient client, CancellationToken cancellationToken = default)
+    public static async Task EnsureIndexExistsAsync(ElasticsearchClient client,
+        CancellationToken cancellationToken = default)
     {
         var existsResponse = await client.Indices.ExistsAsync(CarsIndexName, cancellationToken);
-        
+
         if (!existsResponse.Exists)
         {
             var createResponse = await client.Indices.CreateAsync<CarDocument>(CarsIndexName, c => c
@@ -43,9 +44,8 @@ public static class ElasticsearchHelper
                 ), cancellationToken);
 
             if (!createResponse.IsValidResponse)
-            {
-                throw new Exception($"Failed to create index: {createResponse.ElasticsearchServerError?.Error?.Reason}");
-            }
+                throw new Exception(
+                    $"Failed to create index: {createResponse.ElasticsearchServerError?.Error?.Reason}");
         }
     }
 
@@ -82,10 +82,7 @@ public static class ElasticsearchHelper
 
     private static string GetStringValue(BsonDocument doc, string fieldName)
     {
-        if (doc.Contains(fieldName) && !doc[fieldName].IsBsonNull)
-        {
-            return doc[fieldName].ToString() ?? string.Empty;
-        }
+        if (doc.Contains(fieldName) && !doc[fieldName].IsBsonNull) return doc[fieldName].ToString() ?? string.Empty;
         return string.Empty;
     }
 
@@ -96,6 +93,7 @@ public static class ElasticsearchHelper
             var value = doc[fieldName].ToString();
             return string.IsNullOrWhiteSpace(value) ? null : value;
         }
+
         return null;
     }
 
@@ -109,6 +107,7 @@ public static class ElasticsearchHelper
             if (value.IsNumeric)
                 return value.ToInt32();
         }
+
         return 0;
     }
 
@@ -122,6 +121,7 @@ public static class ElasticsearchHelper
             if (value.IsNumeric)
                 return value.ToDecimal();
         }
+
         return 0;
     }
 
@@ -135,6 +135,7 @@ public static class ElasticsearchHelper
             if (value.IsNumeric)
                 return value.ToDecimal();
         }
+
         return null;
     }
 
@@ -148,6 +149,7 @@ public static class ElasticsearchHelper
             if (value.IsString && DateTime.TryParse(value.AsString, out var result))
                 return result.ToUniversalTime();
         }
+
         return DateTime.UtcNow;
     }
 
@@ -161,7 +163,7 @@ public static class ElasticsearchHelper
             if (value.IsString && DateTime.TryParse(value.AsString, out var result))
                 return result.ToUniversalTime();
         }
+
         return null;
     }
 }
-

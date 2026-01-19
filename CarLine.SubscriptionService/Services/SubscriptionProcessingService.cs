@@ -21,7 +21,6 @@ public sealed class SubscriptionProcessingService(
             .ToListAsync(cancellationToken);
 
         foreach (var sub in subs)
-        {
             try
             {
                 await ProcessOneAsync(sub.Id, cancellationToken);
@@ -30,7 +29,6 @@ public sealed class SubscriptionProcessingService(
             {
                 logger.LogError(ex, "Failed processing subscription {SubscriptionId}", sub.Id);
             }
-        }
     }
 
     public async Task ProcessOneAsync(Guid subscriptionId, CancellationToken cancellationToken)
@@ -92,7 +90,9 @@ public sealed class SubscriptionProcessingService(
             var manu = doc.TryGetValue("manufacturer", out var m1) ? m1.ToString() : string.Empty;
             var model = doc.TryGetValue("model", out var m2) ? m2.ToString() : string.Empty;
             var year = doc.TryGetValue("year", out var y) && int.TryParse(y.ToString(), out var yi) ? yi : 0;
-            var price = doc.TryGetValue("price", out var p) && decimal.TryParse(p.ToString(), out var pd) ? pd : (decimal?)null;
+            var price = doc.TryGetValue("price", out var p) && decimal.TryParse(p.ToString(), out var pd)
+                ? pd
+                : (decimal?)null;
             var region = doc.TryGetValue("region", out var r) ? r.ToString() : null;
 
             db.SubscriptionNotifications.Add(new SubscriptionNotificationEntity
@@ -142,9 +142,7 @@ public sealed class SubscriptionProcessingService(
         }
 
         if (doc.TryGetValue("url", out var urlVal) && urlVal != null && !urlVal.IsBsonNull)
-        {
             return urlVal.ToString() ?? string.Empty;
-        }
 
         return Guid.NewGuid().ToString("N");
     }

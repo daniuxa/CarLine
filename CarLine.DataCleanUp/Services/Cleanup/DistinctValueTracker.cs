@@ -14,10 +14,8 @@ internal sealed class DistinctValueTracker
     public void TrackRow(IReadOnlyDictionary<string, string> record)
     {
         foreach (var kvp in record)
-        {
             if (!string.IsNullOrWhiteSpace(kvp.Value))
                 _distinctValues[kvp.Key].Add(kvp.Value);
-        }
     }
 
     public IEnumerable<(string Column, int Count)> GetCountsOrderedByColumn()
@@ -26,4 +24,3 @@ internal sealed class DistinctValueTracker
             yield return (kvp.Key, kvp.Value.Count);
     }
 }
-

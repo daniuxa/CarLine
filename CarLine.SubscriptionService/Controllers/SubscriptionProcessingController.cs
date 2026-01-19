@@ -22,4 +22,3 @@ public sealed class SubscriptionProcessingController(SubscriptionProcessingServi
         return Ok(new { ok = true });
     }
 }
-

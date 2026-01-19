@@ -1,7 +1,7 @@
-using CarLine.Crawler;
-using Microsoft.AspNetCore.Http.Features;
 using CarLine.Common.DependencyInjection;
+using CarLine.Crawler;
 using CarLine.Crawler.Services;
+using Microsoft.AspNetCore.Http.Features;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Options;
-using System.Text.Json;
+﻿using System.Text.Json;
+using Microsoft.Extensions.Options;
 
 namespace CarLine.Crawler.Services;
 
@@ -108,6 +108,7 @@ public sealed class CarCrawlerService(
             await Task.Delay(500, cancellationToken);
         }
 
-        logger.LogInformation("Completed fetch from {ApiName}. Total cars fetched: {Total}", apiConfig.Name, totalFetched);
+        logger.LogInformation("Completed fetch from {ApiName}. Total cars fetched: {Total}", apiConfig.Name,
+            totalFetched);
     }
 }

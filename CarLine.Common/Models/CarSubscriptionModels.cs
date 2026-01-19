@@ -4,9 +4,7 @@ namespace CarLine.Common.Models;
 
 public sealed class CreateCarSubscriptionRequest
 {
-    [Required]
-    [EmailAddress]
-    public string Email { get; set; } = string.Empty;
+    [Required] [EmailAddress] public string Email { get; set; } = string.Empty;
 
     public string? Manufacturer { get; set; }
     public string? Model { get; set; }
@@ -48,4 +46,3 @@ public sealed class CarSubscriptionDto
     public DateTime SinceUtc { get; set; }
     public bool IsActive { get; set; }
 }
-

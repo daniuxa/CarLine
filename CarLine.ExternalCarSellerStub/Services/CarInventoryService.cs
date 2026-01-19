@@ -8,13 +8,13 @@ public class CarInventoryService
     private readonly List<ExternalCarListing> _cars = new();
     private int _idCounter = 1;
 
-    public int TotalCount => _cars.Count;
-
     public CarInventoryService()
     {
         // Seed with sample data
         SeedData();
     }
+
+    public int TotalCount => _cars.Count;
 
     private void SeedData()
     {
@@ -45,8 +45,7 @@ public class CarInventoryService
 
         // Generate 150 sample cars
         foreach (var (manufacturer, (models, types)) in vehicleData)
-        {
-            for (int i = 0; i < 15; i++)
+            for (var i = 0; i < 15; i++)
             {
                 var model = models[random.Next(models.Length)];
                 var type = types[random.Next(types.Length)];
@@ -80,7 +79,6 @@ public class CarInventoryService
 
                 _idCounter++;
             }
-        }
     }
 
     private static string GenerateVin(Random random)

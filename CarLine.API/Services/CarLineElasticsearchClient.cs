@@ -12,9 +12,9 @@ public sealed class CarLineElasticsearchClient(ElasticsearchClient inner) : ICar
         var response = await inner.SearchAsync(configureRequest, cancellationToken);
 
         return new CarLineSearchResponse<TDocument>(
-            IsValid: response.IsValidResponse,
-            Total: response.Total,
-            Documents: response.Documents,
-            Aggregations: response.Aggregations);
+            response.IsValidResponse,
+            response.Total,
+            response.Documents,
+            response.Aggregations);
     }
 }
