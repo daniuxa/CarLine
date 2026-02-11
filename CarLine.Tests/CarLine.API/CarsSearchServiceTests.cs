@@ -92,6 +92,7 @@ public class CarsSearchServiceTests
     [Test]
     public async Task SearchAsync_facetsTrue_withAggregations_buildsFacetsDictionary()
     {
+        // Arrange
         var docs = new List<CarDocument>
         {
             new()
@@ -122,31 +123,11 @@ public class CarsSearchServiceTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(response);
 
-        var result = await _sut.SearchAsync(
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            1,
-            10,
-            true);
+        // Act
+        var result = await _sut.SearchAsync(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+            null, null, null, null, 1, 10, true);
 
+        // Assert
         Assert.That(result.Facets, Is.Not.Null);
 
         var facets = result.Facets!;

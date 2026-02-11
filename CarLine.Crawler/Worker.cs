@@ -5,12 +5,19 @@ namespace CarLine.Crawler;
 
 public class Worker(
     ILogger<Worker> logger,
-    ICarCrawlerService crawlerService,
+    IServiceScopeFactory scopeFactory,
     IOptions<CrawlerSettings> settings)
     : BackgroundService
 {
     private readonly CrawlerSettings _settings = settings.Value;
     private DateTime _lastFetchTime = DateTime.MinValue;
+
+    private async Task RunFetchAsync(CancellationToken stoppingToken)
+    {
+        using var scope = scopeFactory.CreateScope();
+        var crawlerService = scope.ServiceProvider.GetRequiredService<ICarCrawlerService>();
+        await crawlerService.FetchFromExternalApisAsync(stoppingToken);
+    }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -18,7 +25,7 @@ public class Worker(
             _settings.FetchIntervalHours, _settings.MaxCarsPerFetch);
 
         // Run immediately on startup, then on schedule
-        await crawlerService.FetchFromExternalApisAsync(stoppingToken);
+        await RunFetchAsync(stoppingToken);
         _lastFetchTime = DateTime.UtcNow;
 
         while (!stoppingToken.IsCancellationRequested)
@@ -28,7 +35,7 @@ public class Worker(
 
             if (timeSinceLastFetch >= intervalTimeSpan)
             {
-                await crawlerService.FetchFromExternalApisAsync(stoppingToken);
+                await RunFetchAsync(stoppingToken);
                 _lastFetchTime = DateTime.UtcNow;
             }
             else

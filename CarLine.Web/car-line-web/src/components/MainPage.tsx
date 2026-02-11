@@ -64,7 +64,12 @@ export function MainPage() {
 
       <Container maxWidth="xl">
         <Paper elevation={2} sx={{ p: 3, mt: 4, mb: 4, borderRadius: 3 }}>
-          <CarFilters onFilter={(f) => setFilters(f)} />
+          <CarFilters
+            onFilter={(f) => {
+              setFilters({ ...f, facets: true });
+              setPage(1);
+            }}
+          />
 
           <Box sx={{ mt: 3 }}>
             <CarsQueryRenderer

@@ -73,6 +73,7 @@ export default function FiltersForm(props) {
   });
 
   const handleSubmit = (e) => {
+    e?.preventDefault?.();
     onFilter(getFilters());
   };
 

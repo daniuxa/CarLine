@@ -22,6 +22,7 @@ builder.Services.Configure<CrawlerSettings>(
 
 builder.Services.AddHttpClient();
 
+// These depend on IMongoDatabase (scoped via AddCarLineMongoDatabase), so they must not be singletons.
 builder.Services.AddScoped<ICarCrawlerService, CarCrawlerService>();
 builder.Services.AddHostedService<Worker>();
 
@@ -31,6 +32,7 @@ builder.Services.AddCarLineMongoClient(builder.Configuration, allowLocalFallback
 
 builder.Services.AddCarLineMongoDatabase("carsnosql");
 
+// Repository depends on IMongoDatabase (scoped)
 builder.Services.AddScoped<ICrawledCarsRepository, MongoCrawledCarsRepository>();
 
 var app = builder.Build();

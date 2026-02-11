@@ -5,7 +5,7 @@ import { useCarsSearch } from '../hooks/useCarsSearch';
 import CarList from './CarList';
 
 function CarsQueryRenderer({ filters, page, pageSize, onPageChange }) {
-  const { replaceFacets } = useFacets();
+  const { facets, replaceFacets } = useFacets();
   const { data, isLoading, isError, error } = useCarsSearch(
     filters,
     page,
@@ -21,7 +21,9 @@ function CarsQueryRenderer({ filters, page, pageSize, onPageChange }) {
   const total = data?.total ?? 0;
   const cars = data?.cars ?? [];
 
-  if (data?.facets) {
+  // Facets should be captured from the initial (unfiltered) search and then kept stable.
+  // This avoids changing available filter options based on current filtered results.
+  if (data?.facets && Object.keys(facets || {}).length === 0) {
     replaceFacets(data.facets);
   }
 
