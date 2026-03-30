@@ -138,7 +138,7 @@ function CarList({ cars, total = 0, page = 1, pageSize = 9, onPageChange }) {
                           const posted = car.posting_date;
                           try {
                             return posted ? (isNaN(Date.parse(posted)) ? posted : new Date(posted).toLocaleDateString()) : '—';
-                          } catch (e) { return posted || '—'; }
+                          } catch { return posted || '—'; }
                         })()}</Typography>
                       </Box>
                     </Grid>

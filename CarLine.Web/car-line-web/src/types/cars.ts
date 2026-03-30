@@ -1,3 +1,5 @@
+import type { FacetsState } from './facets';
+
 export interface CarListing {
   id: string | number;
   classification_date?: string;
@@ -33,5 +35,5 @@ export interface CarListing {
 export interface CarsSearchResponse {
   cars: CarListing[];
   total: number;
-  facets?: Record<string, unknown>;
+  facets?: FacetsState;
 }

@@ -98,7 +98,7 @@ function PriceEstimator({ open, onClose }) {
     handleReset();
   }, [open]);
 
-  const { data, isLoading, isError } = usePriceEstimator(requestBody);
+  const { data, isLoading } = usePriceEstimator(requestBody);
   const estimatedPrice = data?.estimatedPrice ?? null;
 
   const handleSubmit = () => {
