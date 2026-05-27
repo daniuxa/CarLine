@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Azure.Storage.Blobs"    Version="13.1.0"/>
+        <PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.19.4"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting"  Version="10.0.0"/>
+        <PackageReference Include="MongoDB.Driver"                Version="2.22.0"/>
+        <PackageReference Include="CsvHelper"                     Version="30.0.1"/>
+        <PackageReference Include="Azure.Storage.Blobs"           Version="12.26.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\CarLine.Common\CarLine.Common.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <!-- ① Core — pure data types, zero external dependencies -->
+        <Compile Include="Core\CleanupResult.fs" />
+        <Compile Include="Core\ProcessingStats.fs" />
+        <Compile Include="Core\DataCleanupConstants.fs" />
+
+        <!-- ② Domain — pure business rules, depends only on Core -->
+        <Compile Include="Domain\RecordCleaner.fs" />
+        <Compile Include="Domain\DistinctValueTracker.fs" />
+
+        <!-- ③ Services — high-level orchestration, depends on Core + Domain.
+                          PipelineDeps has NO Infrastructure types in its signature. -->
+        <Compile Include="Services\Pipeline.fs" />
+
+        <!-- ④ Infrastructure — implements the abstractions, talks to external systems.
+                                 Depends on Core + Domain + Services. -->
+        <Compile Include="Infrastructure\BsonValueConverters.fs" />
+        <Compile Include="Infrastructure\BsonReader.fs" />
+        <Compile Include="Infrastructure\RecordExtractor.fs" />
+        <Compile Include="Infrastructure\MongoUpsertBatch.fs" />
+        <Compile Include="Infrastructure\CsvWriter.fs" />
+        <Compile Include="Infrastructure\BlobUploader.fs" />
+        <Compile Include="Infrastructure\MongoRepository.fs" />
+        <Compile Include="Infrastructure\ElasticsearchIndexer.fs" />
+        <Compile Include="Infrastructure\StreamProcessor.fs" />
+
+        <!-- ⑤ Application — wires DI, no business logic -->
+        <Compile Include="Application\DataCleanupService.fs" />
+        <Compile Include="Application\CleanupController.fs" />
+        <Compile Include="Application\Worker.fs" />
+
+        <Compile Include="Program.fs" />
+    </ItemGroup>
+
+</Project>

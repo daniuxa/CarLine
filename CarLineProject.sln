@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarLine.SubscriptionService
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarLine.Tests", "CarLine.Tests\CarLine.Tests.csproj", "{FAD63ABD-C636-4E5D-843A-10A931CE0E74}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "CarLine.DataCleanUp.FSharp", "CarLine.DataCleanUp.FSharp\CarLine.DataCleanUp.FSharp.fsproj", "{16BCFEB0-47C5-4E88-B60E-3D5859F0C788}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -164,6 +166,18 @@ Global
 		{FAD63ABD-C636-4E5D-843A-10A931CE0E74}.Release|x64.Build.0 = Release|Any CPU
 		{FAD63ABD-C636-4E5D-843A-10A931CE0E74}.Release|x86.ActiveCfg = Release|Any CPU
 		{FAD63ABD-C636-4E5D-843A-10A931CE0E74}.Release|x86.Build.0 = Release|Any CPU
+		{16BCFEB0-47C5-4E88-B60E-3D5859F0C788}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16BCFEB0-47C5-4E88-B60E-3D5859F0C788}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16BCFEB0-47C5-4E88-B60E-3D5859F0C788}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{16BCFEB0-47C5-4E88-B60E-3D5859F0C788}.Debug|x64.Build.0 = Debug|Any CPU
+		{16BCFEB0-47C5-4E88-B60E-3D5859F0C788}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{16BCFEB0-47C5-4E88-B60E-3D5859F0C788}.Debug|x86.Build.0 = Debug|Any CPU
+		{16BCFEB0-47C5-4E88-B60E-3D5859F0C788}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16BCFEB0-47C5-4E88-B60E-3D5859F0C788}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16BCFEB0-47C5-4E88-B60E-3D5859F0C788}.Release|x64.ActiveCfg = Release|Any CPU
+		{16BCFEB0-47C5-4E88-B60E-3D5859F0C788}.Release|x64.Build.0 = Release|Any CPU
+		{16BCFEB0-47C5-4E88-B60E-3D5859F0C788}.Release|x86.ActiveCfg = Release|Any CPU
+		{16BCFEB0-47C5-4E88-B60E-3D5859F0C788}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
